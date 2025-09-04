@@ -1,0 +1,99 @@
+name,age,city,mobile,status
+Adebayo Okoro,28,Lagos,08031234567,Single
+Ngozi Eze,34,Abuja,09098765432,Married
+Musa Ibrahim,45,Kano,07065554321,Married
+Funmilayo Adekunle,22,Ibadan,08123456789,In a relationship
+Chinedu Nwosu,51,Enugu,08056789012,Divorced
+Fatima Bello,29,Kaduna,07032109876,Single
+Tunde Ojo,38,Benin City,09034567890,Married
+Aisha Lawal,62,Port Harcourt,08187654321,Divorced
+Emeka Okonkwo,31,Lagos,08023456789,Single
+Zainab Abubakar,25,Abuja,08154321098,In a relationship
+David Adebayo,41,Ibadan,07056789012,Married
+Grace Okoro,27,Kano,09087654321,Single
+Samuel Nwosu,55,Enugu,08076543210,Married
+Blessing Ibrahim,33,Kaduna,08143210987,In a relationship
+Femi Bello,48,Benin City,07012345678,Divorced
+Amara Eze,24,Port Harcourt,09056789012,Single
+Ibrahim Lawal,39,Lagos,08089012345,Married
+Esther Ojo,30,Abuja,08112345678,Single
+Obinna Okonkwo,42,Kano,07045678901,Married
+Chioma Adekunle,26,Ibadan,09021098765,In a relationship
+Yusuf Musa,58,Enugu,08098765432,Divorced
+Halima Abubakar,32,Kaduna,08167890123,Single
+Paul Adebayo,44,Benin City,07089012345,Married
+Victoria Okoro,29,Port Harcourt,09076543210,In a relationship
+Ahmed Nwosu,50,Lagos,08034567890,Married
+Amina Ibrahim,36,Abuja,08132109876,Single
+Peter Bello,47,Kano,07023456789,Divorced
+Joy Eze,23,Ibadan,09065432109,Single
+Mustapha Lawal,37,Enugu,08067890123,Married
+Precious Ojo,35,Kaduna,08178901234,In a relationship
+Daniel Okonkwo,43,Benin City,07090123456,Married
+Sarah Adekunle,28,Port Harcourt,09043210987,Single
+Mohammed Musa,60,Lagos,08045678901,Divorced
+Rebecca Abubakar,31,Abuja,08101234567,Married
+Stephen Adebayo,49,Kano,07078901234,Married
+Cynthia Okoro,25,Ibadan,09012345678,In a relationship
+Abdullahi Nwosu,53,Enugu,08054321098,Divorced
+Elizabeth Ibrahim,33,Kaduna,08121098765,Single
+Joseph Bello,46,Benin City,07067890123,Married
+Mary Eze,27,Port Harcourt,09032109876,Single
+Umar Lawal,40,Lagos,08021098765,Married
+Peace Ojo,34,Abuja,08156789012,In a relationship
+Kingsley Okonkwo,41,Kano,07054321098,Married
+Gift Adekunle,22,Ibadan,09089012345,Single
+Ali Musa,57,Enugu,08078901234,Divorced
+Hadiza Abubakar,29,Kaduna,08145678901,Single
+Emmanuel Adebayo,52,Benin City,07010987654,Married
+Jessica Okoro,26,Port Harcourt,09054321098,In a relationship
+Sani Nwosu,54,Lagos,08087654321,Divorced
+Hope Ibrahim,30,Abuja,08110987654,Single
+Isaac Bello,45,Kano,07043210987,Married
+Patience Eze,32,Ibadan,09023456789,Married
+Adamu Lawal,38,Enugu,08090123456,In a relationship
+Success Ojo,24,Kaduna,08165432109,Single
+Benjamin Okonkwo,44,Benin City,07087654321,Married
+Dorcas Adekunle,31,Port Harcourt,09078901234,Single
+Hassan Musa,59,Lagos,08032109876,Divorced
+Faith Abubakar,28,Abuja,08134567890,In a relationship
+Joshua Adebayo,47,Kano,07021098765,Married
+Happiness Okoro,23,Ibadan,09067890123,Single
+Ismaila Nwosu,56,Enugu,08065432109,Divorced
+Mercy Ibrahim,35,Kaduna,08176543210,Single
+Kelvin Bello,42,Benin City,07098765432,Married
+Gloria Eze,29,Port Harcourt,09045678901,Married
+Shehu Lawal,39,Lagos,08043210987,In a relationship
+Judith Ojo,33,Abuja,08109876543,Single
+Alex Okonkwo,40,Kano,07076543210,Married
+Chidinma Adekunle,25,Ibadan,09010987654,Single
+Salisu Musa,61,Enugu,08052109876,Divorced
+Racheal Abubakar,27,Kaduna,08123210987,In a relationship
+Godwin Adebayo,51,Benin City,07065432109,Married
+Sandra Okoro,26,Port Harcourt,09030987654,Single
+Bashir Nwosu,50,Lagos,08029876543,Married
+Christiana Ibrahim,36,Abuja,08158765432,Single
+Richard Bello,48,Kano,07056543210,Divorced
+Linda Eze,30,Ibadan,09086543210,In a relationship
+Nasir Lawal,37,Enugu,08074321098,Married
+Vivian Ojo,32,Kaduna,08140987654,Single
+Anthony Okonkwo,43,Benin City,07018765432,Married
+Rose Adekunle,31,Port Harcourt,09052109876,Single
+Haruna Musa,55,Lagos,08085432109,Divorced
+Janet Abubakar,34,Abuja,08116543210,In a relationship
+Stanley Adebayo,46,Kano,07040987654,Married
+Evelyn Okoro,24,Ibadan,09027654321,Single
+Ifeanyi Nwosu,52,Enugu,08096543210,Divorced
+Ruth Ibrahim,29,Kaduna,08169876543,Single
+Eric Bello,49,Benin City,07085432109,Married
+Monica Eze,28,Port Harcourt,09074321098,In a relationship
+Kabiru Lawal,41,Lagos,08038765432,Married
+Juliet Ojo,30,Abuja,08130987654,Single
+Philip Okonkwo,44,Kano,07027654321,Married
+Anita Adekunle,27,Ibadan,09069876543,Single
+Bello Musa,58,Enugu,08064321098,Divorced
+Deborah Abubakar,33,Kaduna,08172109876,In a relationship
+Henry Adebayo,45,Benin City,07096543210,Married
+Stella Okoro,26,Port Harcourt,09049876543,Single
+Frank Nwosu,53,Lagos,08040987654,Divorced
+Chika Ibrahim,32,Abuja,08107654321,Single

@@ -1,0 +1,101 @@
+ID,Name,Age,Email,Phone,City,Country,Salary,Department,JoiningDate
+1,Employee_1,57.0,user1@example.com,+2349841546319,Kano,Nigeria,103209.0,Sales,2021-01-14
+2,Employee_2,32.0,user2@example.com,+2348620513824,Port Harcourt,Nigeria,119613.0,Engineering,2021-05-02
+3,Employee_3,46.0,user3@example.com,+2347499258918,Abuja,Nigeria,178171.0,Sales,2021-03-05
+4,Employee_4,34.0,user4@example.com,+2347266836996,Lagos,Nigeria,161516.0,HR,2021-01-29
+5,Employee_5,40.0,user5@example.com,+2349292797755,Abuja,Nigeria,135855.0,Marketing,2021-12-05
+6,Employee_6,26.0,user6@example.com,+2348752313641,Abuja,Nigeria,180329.0,Sales,2022-07-08
+7,Employee_7,36.0,user7@example.com,+2349924515703,Abuja,Nigeria,155279.0,Engineering,2022-03-16
+8,Employee_8,24.0,user8@example.com,,Lagos,Nigeria,191899.0,HR,2021-04-04
+9,Employee_9,43.0,user9@example.com,+2349093830003,Lagos,Nigeria,165016.0,Sales,2022-06-15
+10,,40.0,user10@example.com,+2348979973834,Lagos,Nigeria,81689.0,Engineering,2021-01-10
+11,Employee_11,54.0,user11@example.com,+2347129989225,,Nigeria,146896.0,Engineering,2021-05-24
+12,Employee_12,25.0,,+2348446051469,Port Harcourt,Nigeria,149726.0,Engineering,2022-09-10
+13,Employee_13,56.0,user13@example.com,+2349068383411,Kano,Nigeria,88483.0,,2021-04-17
+14,Employee_14,51.0,user14@example.com,+2347678202477,Abuja,Nigeria,,Marketing,2021-04-27
+15,Employee_15,,user15@example.com,+2347262426492,Abuja,Nigeria,102340.0,HR,2021-08-04
+16,Employee_16,23.0,user16@example.com,,Abuja,Nigeria,150346.0,Marketing,
+17,Employee_17,27.0,user17@example.com,+2349061245926,Port Harcourt,Nigeria,98860.0,HR,2022-03-02
+18,Employee_18,55.0,user18@example.com,+2347819897742,Kano,Nigeria,84021.0,Engineering,2021-07-21
+19,Employee_19,37.0,user19@example.com,+2347076394000,Kano,Nigeria,101644.0,Engineering,2021-12-21
+20,,51.0,user20@example.com,+2348073637273,Abuja,Nigeria,65590.0,Marketing,2021-09-30
+21,Employee_21,28.0,user21@example.com,+2348763390864,Abuja,Nigeria,99341.0,Sales,2022-07-28
+22,Employee_22,44.0,user22@example.com,+2348450299150,,Nigeria,67244.0,Engineering,2021-03-29
+23,Employee_23,32.0,user23@example.com,+2349339138612,Lagos,Nigeria,130294.0,Sales,2020-02-16
+24,Employee_24,56.0,,,Kano,Nigeria,50221.0,Engineering,2020-02-04
+25,Employee_25,53.0,user25@example.com,+2349389268774,Kano,Nigeria,68547.0,Sales,2022-07-24
+26,Employee_26,59.0,user26@example.com,+2348787458364,Port Harcourt,Nigeria,91408.0,,2020-07-11
+27,Employee_27,51.0,user27@example.com,+2349635815244,Kano,Nigeria,73651.0,HR,2022-09-10
+28,Employee_28,24.0,user28@example.com,+2347688250103,Abuja,Nigeria,,Sales,2020-04-19
+29,Employee_29,51.0,user29@example.com,+2349685282735,Port Harcourt,Nigeria,194555.0,Engineering,2022-03-19
+30,,,user30@example.com,+2347411212208,Lagos,Nigeria,130141.0,Sales,2020-08-18
+31,Employee_31,28.0,user31@example.com,+2349822455730,Port Harcourt,Nigeria,196124.0,HR,2021-05-06
+32,Employee_32,38.0,user32@example.com,,Port Harcourt,Nigeria,198513.0,HR,
+33,Employee_33,26.0,user33@example.com,+2347160166687,,Nigeria,90708.0,Sales,2020-06-10
+34,Employee_34,59.0,user34@example.com,+2347230442484,Port Harcourt,Nigeria,128027.0,Sales,2020-09-22
+35,Employee_35,37.0,user35@example.com,+2347601645532,Abuja,Nigeria,64081.0,Sales,2021-04-09
+36,Employee_36,40.0,,+2348407403833,Kano,Nigeria,160469.0,Sales,2021-05-17
+37,Employee_37,52.0,user37@example.com,+2347409134374,Port Harcourt,Nigeria,127793.0,Sales,2020-10-08
+38,Employee_38,41.0,user38@example.com,+2348681985723,Abuja,Nigeria,193083.0,Sales,2021-03-18
+39,Employee_39,25.0,user39@example.com,+2349395827859,Port Harcourt,Nigeria,190087.0,,2020-03-02
+40,,31.0,user40@example.com,,Kano,Nigeria,157415.0,Marketing,2020-11-14
+41,Employee_41,55.0,user41@example.com,+2348175217198,Kano,Nigeria,50749.0,HR,2022-01-03
+42,Employee_42,53.0,user42@example.com,+2347529487550,Abuja,Nigeria,,Engineering,2021-02-15
+43,Employee_43,56.0,user43@example.com,+2348309466858,Abuja,Nigeria,182229.0,Marketing,2020-08-02
+44,Employee_44,41.0,user44@example.com,+2347800747704,,Nigeria,85792.0,Engineering,2020-06-01
+45,Employee_45,,user45@example.com,+2348189717271,Kano,Nigeria,136723.0,Sales,2021-11-09
+46,Employee_46,44.0,user46@example.com,+2349939639914,Lagos,Nigeria,110392.0,Sales,2020-05-27
+47,Employee_47,52.0,user47@example.com,+2348096122484,Kano,Nigeria,88277.0,Engineering,2021-09-27
+48,Employee_48,58.0,,,Lagos,Nigeria,171799.0,HR,
+49,Employee_49,30.0,user49@example.com,+2349020644794,Port Harcourt,Nigeria,133657.0,HR,2022-06-21
+50,,57.0,user50@example.com,+2347100190251,Kano,Nigeria,127195.0,HR,2020-04-04
+51,Employee_51,34.0,user51@example.com,+2349221628517,Abuja,Nigeria,78666.0,HR,2022-05-15
+52,Employee_52,26.0,user52@example.com,+2347959406922,Port Harcourt,Nigeria,189340.0,,2022-09-07
+53,Employee_53,39.0,user53@example.com,+2349573908405,Lagos,Nigeria,136148.0,Marketing,2022-07-05
+54,Employee_54,53.0,user54@example.com,+2349884584709,Kano,Nigeria,191352.0,Marketing,2020-06-15
+55,Employee_55,30.0,user55@example.com,+2347072486902,,Nigeria,157905.0,Engineering,2020-01-25
+56,Employee_56,27.0,user56@example.com,,Kano,Nigeria,,HR,2020-03-17
+57,Employee_57,57.0,user57@example.com,+2347096568835,Lagos,Nigeria,67366.0,Marketing,2021-09-20
+58,Employee_58,25.0,user58@example.com,+2349650272301,Lagos,Nigeria,86834.0,Sales,2021-03-23
+59,Employee_59,53.0,user59@example.com,+2347961692968,Abuja,Nigeria,116578.0,Marketing,2021-11-17
+60,,,,+2349614854354,Abuja,Nigeria,179006.0,Sales,2021-04-27
+61,Employee_61,44.0,user61@example.com,+2347720910752,Kano,Nigeria,114222.0,Engineering,2021-06-29
+62,Employee_62,27.0,user62@example.com,+2348111217768,Lagos,Nigeria,106084.0,Marketing,2020-03-01
+63,Employee_63,35.0,user63@example.com,+2347336295477,Port Harcourt,Nigeria,168267.0,Engineering,2021-05-04
+64,Employee_64,23.0,user64@example.com,,Port Harcourt,Nigeria,147274.0,Marketing,
+65,Employee_65,41.0,user65@example.com,+2349889137172,Lagos,Nigeria,156349.0,,2020-03-19
+66,Employee_66,26.0,user66@example.com,+2349071060944,,Nigeria,64830.0,Sales,2021-08-11
+67,Employee_67,29.0,user67@example.com,+2349190035054,Port Harcourt,Nigeria,90402.0,Engineering,2022-06-07
+68,Employee_68,34.0,user68@example.com,+2347529147701,Abuja,Nigeria,197594.0,Engineering,2022-05-11
+69,Employee_69,54.0,user69@example.com,+2347040599253,Kano,Nigeria,188093.0,HR,2021-05-17
+70,,44.0,user70@example.com,+2349984809439,Lagos,Nigeria,,Sales,2022-04-07
+71,Employee_71,52.0,user71@example.com,+2348792236389,Abuja,Nigeria,139746.0,Marketing,2021-12-12
+72,Employee_72,27.0,,,Kano,Nigeria,54394.0,Marketing,2020-07-04
+73,Employee_73,23.0,user73@example.com,+2349625752075,Lagos,Nigeria,92734.0,HR,2020-11-07
+74,Employee_74,58.0,user74@example.com,+2347429175214,Abuja,Nigeria,89937.0,HR,2021-01-12
+75,Employee_75,,user75@example.com,+2348087909040,Abuja,Nigeria,178401.0,HR,2020-08-10
+76,Employee_76,24.0,user76@example.com,+2348589007462,Port Harcourt,Nigeria,127780.0,Engineering,2021-09-29
+77,Employee_77,38.0,user77@example.com,+2347213543992,,Nigeria,149093.0,Sales,2021-05-30
+78,Employee_78,32.0,user78@example.com,+2348972725676,Kano,Nigeria,167721.0,,2020-09-23
+79,Employee_79,33.0,user79@example.com,+2347646420330,Kano,Nigeria,160641.0,Marketing,2020-10-25
+80,,40.0,user80@example.com,,Lagos,Nigeria,50296.0,Marketing,
+81,Employee_81,37.0,user81@example.com,+2347342262420,Lagos,Nigeria,54562.0,Marketing,2021-05-31
+82,Employee_82,43.0,user82@example.com,+2348718619711,Lagos,Nigeria,97550.0,Sales,2020-01-26
+83,Employee_83,28.0,user83@example.com,+2349894236571,Port Harcourt,Nigeria,151598.0,Sales,2021-07-09
+84,Employee_84,49.0,,+2347917466527,Port Harcourt,Nigeria,,HR,2020-12-26
+85,Employee_85,38.0,user85@example.com,+2347837670584,Kano,Nigeria,124512.0,HR,2022-02-09
+86,Employee_86,39.0,user86@example.com,+2349705484984,Port Harcourt,Nigeria,181630.0,Engineering,2020-09-25
+87,Employee_87,44.0,user87@example.com,+2348004562244,Kano,Nigeria,89493.0,HR,2021-05-18
+88,Employee_88,36.0,user88@example.com,,,Nigeria,194011.0,HR,2020-05-31
+89,Employee_89,30.0,user89@example.com,+2347560066137,Kano,Nigeria,140177.0,Marketing,2022-01-14
+90,,,user90@example.com,+2348481792862,Kano,Nigeria,161724.0,Sales,2022-05-25
+91,Employee_91,52.0,user91@example.com,+2349437924727,Kano,Nigeria,172516.0,,2021-01-01
+92,Employee_92,47.0,user92@example.com,+2349684877516,Lagos,Nigeria,124132.0,Sales,2020-05-20
+93,Employee_93,49.0,user93@example.com,+2349452978082,Abuja,Nigeria,105982.0,Sales,2021-06-10
+94,Employee_94,38.0,user94@example.com,+2347514127117,Abuja,Nigeria,72762.0,Engineering,2020-03-02
+95,Employee_95,37.0,user95@example.com,+2349186147498,Kano,Nigeria,107298.0,HR,2020-03-22
+96,Employee_96,40.0,,,Port Harcourt,Nigeria,119752.0,Sales,
+97,Employee_97,28.0,user97@example.com,+2348762100547,Kano,Nigeria,181654.0,HR,2021-08-22
+98,Employee_98,51.0,user98@example.com,+2348662655501,Lagos,Nigeria,,Sales,2020-11-22
+99,Employee_99,31.0,user99@example.com,+2349293571569,,Nigeria,178353.0,HR,2022-09-26
+100,,49.0,user100@example.com,+2347054107251,Kano,Nigeria,154813.0,Sales,2020-01-02

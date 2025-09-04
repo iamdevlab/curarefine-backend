@@ -1,0 +1,9 @@
+id,name,age,salary,join_date,is_manager
+1,John Doe,35.0,75000.5,2020-01-15,True
+2,Jane Smith,,82500.75,2019-05-23,False
+3,Bob Johnson,42.0,92000.0,2018-11-30,True
+4,Alice Brown,29.0,68000.25,2021-02-14,False
+5,Charlie Wilson,38.0,,2022-07-01,True
+6,,31.0,72000.0,2020-09-19,False
+7,David Lee,45.0,105000.0,2017-03-10,True
+8,Emma Davis,27.0,58000.5,2023-01-05,False

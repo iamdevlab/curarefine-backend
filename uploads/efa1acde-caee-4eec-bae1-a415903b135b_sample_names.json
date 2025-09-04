@@ -1,0 +1,52 @@
+[
+    {
+        "name": "John Doe",
+        "age": " 29",
+        "city": "New York"
+    },
+    {
+        "name": " Jane Smith",
+        "age": "34 ",
+        "city": "los angeles"
+    },
+    {
+        "name": "Michael   Brown",
+        "age": "forty",
+        "city": "Chicago"
+    },
+    {
+        "name": "Lucy",
+        "age": "22",
+        "city": ""
+    },
+    {
+        "name": "Robert Jr.",
+        "age": "  45",
+        "city": "houston"
+    },
+    {
+        "name": "Anna-Marie",
+        "age": "27",
+        "city": "San francisco"
+    },
+    {
+        "name": "David",
+        "age": "??",
+        "city": "Miami"
+    },
+    {
+        "name": " Sarah O'Conner",
+        "age": "31",
+        "city": " new orleans "
+    },
+    {
+        "name": "Tommy",
+        "age": "19",
+        "city": "DALLAS"
+    },
+    {
+        "name": "",
+        "age": "50",
+        "city": "Seattle"
+    }
+]

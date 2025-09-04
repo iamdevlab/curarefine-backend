@@ -1,0 +1,261 @@
+TransactionID,CustomerID,Date,ProductID,ProductCategory,Quantity,UnitPrice,TotalAmount,PaymentMethod,StoreLocation
+1,1103.0,2024-12-11,10147,Household,5,8.05,40.25,Credit Card,East End
+2,1180.0,2024-05-26,10186,Household,7,24.96,174.72,Cash,West Suburbs
+3,1093.0,2024-05-27,10096,Bakery,1,14.59,14.59,Mobile Payment,Central City
+4,1015.0,2024-12-17,10001,Bakery,4,27.68,110.72,Cash,West Suburbs
+5,1107.0,2024-07-17,10069,Dairy,6,9.36,56.16,Mobile Payment,West Suburbs
+6,1072.0,2024-11-03,10004,Snacks,2,42.31,84.62,Cash,West Suburbs
+7,1189.0,2024-05-07,10016,Household,5,42.55,212.75,,East End
+8,1021.0,2024-02-08,10024,Produce,1,47.83,47.83,,West Suburbs
+9,1103.0,2024-12-03,10080,Meat,6,9.0,54.0,Credit Card,West Suburbs
+10,,2024-12-25,10002,Dairy,6,31.73,190.38,Cash,West Suburbs
+11,1075.0,2024-05-08,10128,Household,4,24.5,98.0,Cash,Central City
+12,1088.0,2024-09-23,10160,Snacks,8,18.2,145.6,Credit Card,Central City
+13,1117.0,2024-05-30,10084,Snacks,4,18.55,74.2,Cash,East End
+14,1100.0,2024-10-24,10152,Dairy,8,21.52,172.16,Cash,East End
+15,1104.0,2024-04-08,10140,Dairy,8,35.69,285.52,Credit Card,Central City
+16,1152.0,2024-09-19,10178,Produce,5,30.52,152.6,Credit Card,East End
+17,1131.0,2024-09-08,10163,Bakery,4,23.79,95.16,Credit Card,Central City
+18,1150.0,2024-05-23,10124,Household,2,5.18,10.36,Credit Card,
+19,1053.0,2024-12-11,10033,Snacks,3,5.27,15.81,Credit Card,West Suburbs
+20,1002.0,2024-04-21,10161,Household,3,1.61,4.83,Credit Card,East End
+21,1088.0,2024-02-29,10189,Household,4,48.43,193.72,Credit Card,Central City
+22,1158.0,2024-01-02,10179,Meat,4,1.75,7.0,Credit Card,Central City
+23,1038.0,2024-10-30,10171,Snacks,5,6.5,32.5,Credit Card,East End
+24,1130.0,2024-09-10,10101,Household,4,16.76,67.04,Credit Card,Central City
+25,1192.0,2024-05-19,10012,Snacks,8,40.66,325.28,Cash,West Suburbs
+26,1188.0,2024-02-06,10067,Produce,6,48.16,288.96,Credit Card,East End
+27,1021.0,2024-06-08,10065,Dairy,6,39.82,238.92,Mobile Payment,East End
+28,1161.0,2024-01-09,10161,Bakery,8,34.99,279.92,Mobile Payment,Central City
+29,1058.0,2024-08-20,10168,Household,7,26.78,187.46,Credit Card,East End
+30,1022.0,2024-04-08,10074,Beverages,8,5.71,45.68,Credit Card,Central City
+31,1089.0,2024-05-26,10043,Produce,2,47.97,95.94,Credit Card,Central City
+32,1049.0,2024-10-30,10044,Beverages,9,38.28,344.52,Credit Card,Central City
+33,1059.0,2024-07-26,10029,Beverages,1,32.49,32.49,Cash,Central City
+34,1170.0,2024-05-10,10141,Dairy,8,38.31,306.48,Credit Card,Central City
+35,1188.0,2024-05-31,10012,Bakery,4,36.62,146.48,Credit Card,East End
+36,1015.0,2024-02-23,10095,Beverages,4,32.41,129.64,Credit Card,West Suburbs
+37,1190.0,2024-04-29,10046,Meat,5,49.06,245.3,Credit Card,
+38,1190.0,2024-06-09,10130,Snacks,8,45.31,362.48,Cash,East End
+39,1175.0,2024-04-25,10035,Meat,5,32.86,164.3,Credit Card,East End
+40,1190.0,2024-03-15,10081,Household,8,35.12,280.96,Credit Card,West Suburbs
+41,1051.0,2024-04-22,10090,Meat,1,4.0,4.0,Credit Card,West Suburbs
+42,1108.0,2024-04-13,10008,Meat,9,33.99,305.91,Mobile Payment,West Suburbs
+43,1055.0,2024-12-05,10093,Household,6,3.64,21.84,Credit Card,West Suburbs
+44,1064.0,2024-09-10,10154,Dairy,3,30.03,90.09,Credit Card,West Suburbs
+45,1131.0,2024-08-14,10090,Bakery,8,49.97,399.76,Cash,Central City
+46,1051.0,2024-04-21,10162,Bakery,9,28.46,256.14,Credit Card,East End
+47,1135.0,2024-04-08,10115,Snacks,6,24.45,146.7,Mobile Payment,Central City
+48,1021.0,2024-06-01,10105,Beverages,7,16.67,116.69,Cash,West Suburbs
+49,1073.0,2024-12-14,10135,Snacks,1,7.35,7.35,Cash,West Suburbs
+50,1167.0,2024-12-03,10196,Produce,5,36.95,184.75,Cash,West Suburbs
+51,1018.0,2024-07-12,10058,Bakery,5,10.84,54.2,Mobile Payment,Central City
+52,1132.0,2024-11-05,10114,Bakery,4,7.09,28.36,Mobile Payment,Central City
+53,1089.0,2024-06-11,10075,Dairy,6,21.96,131.76,Cash,West Suburbs
+54,1060.0,2024-07-26,10157,Meat,7,40.07,280.49,Cash,Central City
+55,1014.0,2024-06-17,10120,Dairy,9,37.64,338.76,Credit Card,Central City
+56,1009.0,2024-06-09,10164,Dairy,1,4.16,4.16,Credit Card,West Suburbs
+57,1090.0,2024-03-08,10021,Household,6,23.57,141.42,Credit Card,
+58,1053.0,2024-10-15,10164,Produce,7,26.84,187.88,Credit Card,East End
+59,1130.0,2024-10-03,10138,Meat,3,32.76,98.28,Credit Card,East End
+60,1084.0,2024-10-30,10101,Snacks,8,33.03,264.24,Credit Card,East End
+61,1092.0,2024-05-14,10152,Dairy,5,19.19,95.95,Credit Card,East End
+62,1111.0,2024-07-13,10192,Beverages,9,28.69,258.21,Cash,West Suburbs
+63,1188.0,2024-05-07,10177,Household,5,24.83,124.15,Mobile Payment,West Suburbs
+64,1199.0,2024-02-02,10099,Household,9,44.42,399.78,Credit Card,West Suburbs
+65,1172.0,2024-06-24,10036,Bakery,4,27.22,108.88,,East End
+66,1008.0,2024-01-22,10096,Household,9,22.89,206.01,Cash,East End
+67,1175.0,2024-08-25,10152,Dairy,5,21.12,105.6,Credit Card,Central City
+68,1035.0,2024-06-06,10151,Produce,9,29.26,263.34,Cash,Central City
+69,1081.0,2024-02-07,10190,Dairy,3,40.49,121.47,Credit Card,East End
+70,1164.0,2024-08-17,10037,Household,4,27.61,110.44,Credit Card,East End
+71,1050.0,2024-12-30,10012,Dairy,9,33.59,302.31,Mobile Payment,East End
+72,1104.0,2024-02-20,10113,Produce,6,37.29,223.74,Credit Card,East End
+73,1132.0,2024-09-20,10183,Beverages,2,26.73,53.46,Cash,Central City
+74,1002.0,2024-10-09,10013,Produce,7,22.2,155.4,Cash,East End
+75,1134.0,2024-01-27,10023,Bakery,2,44.02,88.04,Credit Card,Central City
+76,1054.0,2024-08-13,10099,Bakery,2,21.75,43.5,Cash,East End
+77,1106.0,2024-10-03,10105,Bakery,1,23.9,23.9,Mobile Payment,
+78,1004.0,2024-10-12,10030,Produce,3,49.53,148.59,Credit Card,East End
+79,1054.0,2024-04-06,10017,Bakery,6,1.51,9.06,Cash,Central City
+80,1191.0,2024-10-10,10113,Beverages,8,10.5,84.0,Credit Card,Central City
+81,1146.0,2024-11-12,10062,Produce,9,20.12,181.08,Cash,
+82,1044.0,2024-10-30,10084,Produce,7,46.73,327.11,Cash,East End
+83,1162.0,2024-05-26,10112,Household,4,4.9,19.6,Credit Card,West Suburbs
+84,1190.0,2024-01-04,10086,Dairy,6,1.96,11.76,Mobile Payment,West Suburbs
+85,1014.0,2024-02-04,10141,Beverages,5,4.06,20.3,Mobile Payment,Central City
+86,1095.0,2024-07-10,10187,Produce,8,5.79,46.32,Cash,Central City
+87,1048.0,2024-02-18,10019,Produce,1,3.32,3.32,Cash,West Suburbs
+88,1015.0,2024-01-17,10177,Bakery,1,24.77,24.77,Cash,East End
+89,1190.0,2024-06-20,10100,Produce,6,29.67,178.02,Credit Card,Central City
+90,1040.0,2024-08-07,10140,Produce,2,14.68,29.36,Cash,East End
+91,1082.0,2024-06-06,10189,Produce,5,20.82,104.1,Credit Card,East End
+92,1111.0,2024-02-15,10147,Bakery,1,5.95,5.95,Credit Card,West Suburbs
+93,1053.0,2024-01-06,10076,Bakery,7,17.81,124.67,Cash,West Suburbs
+94,1024.0,2024-04-08,10009,Dairy,1,26.84,26.84,Credit Card,West Suburbs
+95,1154.0,2024-08-20,10199,Produce,4,37.02,148.08,Credit Card,West Suburbs
+96,1188.0,2024-02-06,10028,Dairy,9,1.66,14.94,Credit Card,Central City
+97,1124.0,2024-10-06,10128,Meat,1,24.16,24.16,Credit Card,Central City
+98,1041.0,2024-12-14,10052,Beverages,4,15.9,63.6,Cash,West Suburbs
+99,1157.0,2024-10-28,10083,Bakery,6,42.86,257.16,Credit Card,Central City
+100,1015.0,2024-06-29,10111,Snacks,6,36.2,217.2,Cash,West Suburbs
+101,1045.0,2024-04-04,10144,Beverages,8,30.07,240.56,Credit Card,East End
+102,1065.0,2024-04-08,10117,Bakery,1,14.95,14.95,Cash,East End
+103,1089.0,2024-07-06,10069,Household,7,45.65,319.55,Credit Card,East End
+104,1071.0,2024-04-25,10099,Household,1,3.69,3.69,Credit Card,West Suburbs
+105,1009.0,2024-07-09,10140,Bakery,7,6.81,47.67,Cash,East End
+106,1088.0,2024-09-09,10025,Produce,3,20.49,61.47,Cash,Central City
+107,1129.0,2024-06-09,10180,Snacks,8,7.54,60.32,Credit Card,East End
+108,1136.0,2024-09-12,10123,Snacks,3,47.89,143.67,Credit Card,East End
+109,,2024-11-18,10053,Produce,1,40.2,40.2,,East End
+110,1139.0,2024-05-07,10151,Produce,8,14.06,112.48,Credit Card,Central City
+111,1081.0,2024-01-18,10144,Dairy,3,30.04,90.12,Cash,West Suburbs
+112,1136.0,2024-10-07,10057,Dairy,2,49.14,98.28,Credit Card,Central City
+113,1163.0,2024-08-10,10039,Beverages,1,44.38,44.38,Credit Card,West Suburbs
+114,1163.0,2024-02-23,10109,Dairy,3,30.64,91.92,Credit Card,West Suburbs
+115,1033.0,2024-02-27,10181,Dairy,2,45.33,90.66,Credit Card,East End
+116,1123.0,2024-11-18,10042,Snacks,2,49.48,98.96,Credit Card,West Suburbs
+117,1005.0,2024-12-25,10186,Bakery,6,37.55,225.3,Credit Card,Central City
+118,1041.0,2024-06-22,10167,Produce,1,4.65,4.65,Credit Card,Central City
+119,1028.0,2024-10-06,10142,Snacks,2,20.98,41.96,Credit Card,West Suburbs
+120,1135.0,2024-04-23,10122,Household,6,42.13,252.78,Cash,East End
+121,,2024-10-14,10133,Meat,3,12.68,38.04,Credit Card,East End
+122,1012.0,2024-12-07,10163,Meat,4,41.79,167.16,Mobile Payment,Central City
+123,1162.0,2024-05-30,10075,Bakery,1,7.34,7.34,Credit Card,East End
+124,1033.0,2024-05-06,10146,Dairy,8,3.78,30.24,Cash,West Suburbs
+125,1048.0,2024-06-03,10076,Meat,7,20.13,140.91,Cash,West Suburbs
+126,1151.0,2024-09-29,10009,Produce,7,3.28,22.96,Cash,Central City
+127,1062.0,2024-04-13,10074,Produce,3,47.93,143.79,Cash,West Suburbs
+128,1037.0,2024-10-25,10186,Dairy,3,41.57,124.71,Credit Card,Central City
+129,1099.0,2024-09-02,10145,Bakery,2,40.34,80.68,Credit Card,West Suburbs
+130,1172.0,2024-06-24,10007,Produce,1,32.04,32.04,Credit Card,Central City
+131,1104.0,2024-02-08,10174,Produce,7,11.99,83.93,Credit Card,East End
+132,1035.0,2024-06-18,10141,Produce,7,26.64,186.48,Credit Card,West Suburbs
+133,1193.0,2024-09-03,10168,Bakery,2,30.47,60.94,Credit Card,West Suburbs
+134,1101.0,2024-01-26,10170,Household,7,26.96,188.72,Cash,Central City
+135,1175.0,2024-12-20,10137,Meat,8,14.12,112.96,Credit Card,Central City
+136,1131.0,2024-11-01,10178,Beverages,1,26.49,26.49,Cash,West Suburbs
+137,1001.0,2024-01-13,10027,Snacks,9,25.32,227.88,Cash,Central City
+138,1005.0,2024-11-11,10122,Dairy,7,49.82,348.74,Mobile Payment,West Suburbs
+139,1142.0,2024-11-08,10194,Bakery,3,45.03,135.09,Credit Card,East End
+140,1103.0,2024-02-05,10005,Meat,8,23.97,191.76,Credit Card,Central City
+141,1027.0,2024-06-21,10029,Meat,7,31.71,221.97,Credit Card,West Suburbs
+142,1137.0,2024-01-20,10165,Snacks,8,37.77,302.16,,East End
+143,1015.0,2024-11-16,10166,Dairy,6,3.19,19.14,Cash,East End
+144,1090.0,2024-09-20,10083,Bakery,9,44.9,404.1,Credit Card,West Suburbs
+145,1042.0,2024-05-21,10136,Produce,5,43.22,216.1,Cash,Central City
+146,1124.0,2024-05-22,10109,Dairy,3,23.69,71.07,Credit Card,
+147,1179.0,2024-04-01,10065,Beverages,3,20.47,61.41,Cash,East End
+148,1063.0,2024-12-19,10086,Meat,1,14.74,14.74,Cash,West Suburbs
+149,1096.0,2024-11-17,10145,Dairy,8,24.62,196.96,Credit Card,Central City
+150,1052.0,2024-10-14,10071,Household,2,3.65,7.3,Credit Card,East End
+151,1096.0,2024-08-02,10045,Beverages,3,42.83,128.49,Credit Card,West Suburbs
+152,1132.0,2024-12-07,10132,Produce,8,3.22,25.76,Credit Card,Central City
+153,1151.0,2024-02-20,10036,Bakery,8,17.46,139.68,Credit Card,East End
+154,1143.0,2024-06-01,10070,Produce,4,46.68,186.72,Credit Card,Central City
+155,1171.0,2024-07-04,10159,Produce,4,37.16,148.64,Credit Card,East End
+156,1029.0,2024-03-03,10019,Produce,5,15.15,75.75,Credit Card,West Suburbs
+157,1036.0,2024-07-08,10189,Produce,6,13.75,82.5,Credit Card,Central City
+158,1013.0,2024-05-04,10108,Produce,5,1.75,8.75,Cash,East End
+159,,2024-05-29,10182,Produce,7,35.24,246.68,Credit Card,Central City
+160,1071.0,2024-11-09,10167,Household,2,3.87,7.74,Cash,Central City
+161,1187.0,2024-02-27,10091,Bakery,7,27.33,191.31,,West Suburbs
+162,1086.0,2024-12-07,10090,Meat,7,48.16,337.12,Credit Card,Central City
+163,1028.0,2024-10-31,10019,Dairy,1,6.81,6.81,Cash,East End
+164,1066.0,2024-06-28,10039,Household,7,44.88,314.16,Credit Card,East End
+165,1170.0,2024-06-18,10126,Bakery,5,49.59,247.95,,East End
+166,1045.0,2024-11-21,10195,Dairy,3,4.48,13.44,,East End
+167,1062.0,2024-09-27,10173,Household,3,44.32,132.96,Credit Card,West Suburbs
+168,1185.0,2024-02-23,10141,Household,4,26.53,106.12,Credit Card,Central City
+169,1134.0,2024-04-10,10126,Snacks,2,45.47,90.94,Credit Card,West Suburbs
+170,1028.0,2024-09-20,10058,Produce,2,29.21,58.42,Cash,Central City
+171,1028.0,2024-02-22,10148,Produce,1,33.61,33.61,Credit Card,Central City
+172,1108.0,2024-02-29,10061,Beverages,5,27.87,139.35,Credit Card,Central City
+173,1044.0,2024-04-17,10127,Household,4,43.43,173.72,Credit Card,West Suburbs
+174,1084.0,2024-01-05,10105,Meat,2,37.09,74.18,Cash,Central City
+175,1030.0,2024-04-12,10167,Meat,3,26.78,80.34,Credit Card,West Suburbs
+176,1190.0,2024-07-14,10001,Produce,7,43.61,305.27,Credit Card,East End
+177,1075.0,2024-09-18,10131,Snacks,7,13.4,93.8,Credit Card,East End
+178,1128.0,2024-12-30,10092,Produce,4,9.13,36.52,Mobile Payment,Central City
+179,1092.0,2024-12-15,10190,Produce,5,9.28,46.4,Credit Card,West Suburbs
+180,1190.0,2024-02-16,10191,Dairy,5,17.7,88.5,Credit Card,East End
+181,1129.0,2024-12-20,10113,Meat,6,13.08,78.48,Credit Card,
+182,1121.0,2024-11-06,10153,Produce,9,46.61,419.49,Cash,West Suburbs
+183,1027.0,2024-11-03,10056,Bakery,2,6.63,13.26,Credit Card,Central City
+184,1190.0,2024-05-23,10161,Beverages,5,35.4,177.0,Credit Card,East End
+185,1121.0,2024-09-25,10166,Produce,3,10.68,32.04,Cash,Central City
+186,1116.0,2024-05-03,10117,Meat,4,44.26,177.04,Cash,Central City
+187,1003.0,2024-04-15,10134,Produce,6,48.12,288.72,Credit Card,East End
+188,1103.0,2024-06-06,10058,Dairy,8,24.08,192.64,Cash,East End
+189,1198.0,2024-05-26,10044,Meat,1,44.13,44.13,Credit Card,West Suburbs
+190,1155.0,2024-05-24,10173,Bakery,8,1.75,14.0,Credit Card,East End
+191,1137.0,2024-04-29,10160,Produce,7,41.27,288.89,Credit Card,
+192,1062.0,2024-11-14,10173,Bakery,1,12.59,12.59,Mobile Payment,West Suburbs
+193,1165.0,2024-10-01,10061,Bakery,2,45.57,91.14,Credit Card,West Suburbs
+194,1051.0,2024-04-01,10047,Household,3,1.55,4.65,Credit Card,East End
+195,1172.0,2024-02-27,10149,Produce,1,28.47,28.47,Credit Card,Central City
+196,1152.0,2024-12-11,10080,Snacks,9,38.2,343.8,Cash,West Suburbs
+197,1059.0,2024-08-16,10118,Produce,8,14.05,112.4,Credit Card,Central City
+198,1118.0,2024-04-26,10164,Beverages,2,10.87,21.74,Credit Card,Central City
+199,1160.0,2024-11-13,10147,Snacks,9,5.58,50.22,Credit Card,East End
+200,1096.0,2024-10-05,10020,Meat,7,17.33,121.31,Credit Card,Central City
+201,1180.0,2024-05-06,10185,Dairy,9,28.65,257.85,Credit Card,Central City
+202,1113.0,2024-05-08,10146,Dairy,6,7.12,42.72,Cash,East End
+203,1062.0,2024-02-27,10047,Produce,6,19.77,118.62,Credit Card,West Suburbs
+204,1186.0,2024-05-01,10049,Household,4,1.94,7.76,Credit Card,Central City
+205,1052.0,2024-01-01,10014,Snacks,2,41.21,82.42,Cash,East End
+206,1012.0,2024-08-26,10143,Household,7,7.73,54.11,Credit Card,Central City
+207,1039.0,2024-10-16,10159,Bakery,5,15.24,76.2,Credit Card,Central City
+208,1130.0,2024-04-05,10001,Snacks,6,2.39,14.34,Mobile Payment,West Suburbs
+209,1131.0,2024-05-05,10117,Household,2,22.46,44.92,Credit Card,
+210,1113.0,2024-04-27,10054,Produce,5,42.25,211.25,Credit Card,East End
+211,1101.0,2024-02-17,10118,Bakery,4,20.52,82.08,Credit Card,Central City
+212,1113.0,2024-03-29,10003,Snacks,9,10.21,91.89,Credit Card,West Suburbs
+213,1184.0,2024-08-24,10144,Meat,6,38.05,228.3,Credit Card,
+214,,2024-09-28,10185,Snacks,2,39.76,79.52,Credit Card,
+215,1187.0,2024-07-07,10012,Bakery,1,9.93,9.93,Credit Card,West Suburbs
+216,1113.0,2024-07-10,10074,Snacks,5,38.89,194.45,Credit Card,Central City
+217,1002.0,2024-03-09,10016,Produce,9,47.44,426.96,Mobile Payment,West Suburbs
+218,1130.0,2024-10-04,10102,Produce,6,9.57,57.42,Cash,East End
+219,1054.0,2024-12-14,10152,Produce,7,38.89,272.23,Credit Card,West Suburbs
+220,1087.0,2024-09-03,10156,Snacks,5,35.87,179.35,Credit Card,West Suburbs
+221,1129.0,2024-03-16,10117,Beverages,6,24.47,146.82,Cash,West Suburbs
+222,1147.0,2024-06-02,10008,Meat,5,4.31,21.55,Credit Card,East End
+223,1126.0,2024-05-23,10122,Dairy,9,5.12,46.08,Credit Card,West Suburbs
+224,1130.0,2024-03-26,10092,Household,6,42.84,257.04,Mobile Payment,
+225,1053.0,2024-07-03,10164,Dairy,8,49.52,396.16,Credit Card,Central City
+226,1172.0,2024-10-11,10090,Snacks,2,34.29,68.58,Cash,East End
+227,1160.0,2024-08-07,10136,Dairy,9,23.13,208.17,Mobile Payment,West Suburbs
+228,1198.0,2024-03-09,10186,Dairy,5,32.91,164.55,Credit Card,East End
+229,1160.0,2024-02-16,10060,Dairy,7,30.33,212.31,Credit Card,West Suburbs
+230,1068.0,2024-04-03,10178,Produce,1,20.11,20.11,Credit Card,West Suburbs
+231,1183.0,2024-08-25,10028,Snacks,5,4.68,23.4,Cash,West Suburbs
+232,1184.0,2024-07-22,10101,Meat,2,41.34,82.68,Cash,Central City
+233,1123.0,2024-08-05,10041,Produce,6,19.53,117.18,Cash,Central City
+234,1145.0,2024-12-06,10192,Household,1,41.21,41.21,Credit Card,Central City
+235,1038.0,2024-02-08,10155,Dairy,3,13.75,41.25,Cash,East End
+236,1024.0,2024-04-09,10191,Meat,5,1.55,7.75,Mobile Payment,East End
+237,1069.0,2024-10-15,10145,Household,4,9.21,36.84,Cash,Central City
+238,1116.0,2024-09-10,10161,Beverages,3,24.22,72.66,Mobile Payment,East End
+239,1098.0,2024-08-09,10157,Bakery,5,47.3,236.5,Cash,West Suburbs
+240,1198.0,2024-12-22,10141,Household,8,6.46,51.68,Cash,West Suburbs
+241,1139.0,2024-01-23,10046,Beverages,4,42.93,171.72,Credit Card,West Suburbs
+242,1144.0,2024-09-06,10035,Produce,1,27.06,27.06,Credit Card,Central City
+243,1097.0,2024-01-10,10134,Bakery,7,41.56,290.92,Credit Card,East End
+244,1124.0,2024-09-02,10082,Snacks,8,15.97,127.76,Cash,Central City
+245,1187.0,2024-11-20,10115,Beverages,3,42.24,126.72,Credit Card,East End
+246,1070.0,2024-04-09,10197,Meat,6,38.98,233.88,Cash,West Suburbs
+247,1093.0,2024-10-16,10047,Household,2,12.66,25.32,Mobile Payment,Central City
+248,1003.0,2024-06-28,10153,Snacks,7,7.87,55.09,Cash,East End
+249,1148.0,2024-08-10,10194,Produce,8,43.6,348.8,Credit Card,East End
+250,1187.0,2024-09-06,10010,Produce,6,48.22,289.32,Credit Card,West Suburbs
+36,1015.0,2024-02-23,10095,Beverages,4,32.41,129.64,Credit Card,West Suburbs
+182,1121.0,2024-11-06,10153,Produce,9,46.61,419.49,Cash,West Suburbs
+234,1145.0,2024-12-06,10192,Household,1,41.21,41.21,Credit Card,Central City
+106,1088.0,2024-09-09,10025,Produce,3,20.49,61.47,Cash,Central City
+74,1002.0,2024-10-09,10013,Produce,7,22.2,155.4,Cash,East End
+132,1035.0,2024-06-18,10141,Produce,7,26.64,186.48,Credit Card,West Suburbs
+59,1130.0,2024-10-03,10138,Meat,3,32.76,98.28,Credit Card,East End
+111,1081.0,2024-01-18,10144,Dairy,3,30.04,90.12,Cash,West Suburbs
+215,1187.0,2024-07-07,10012,Bakery,1,9.93,9.93,Credit Card,West Suburbs
+37,1190.0,2024-04-29,10046,Meat,5,49.06,245.3,Credit Card,
