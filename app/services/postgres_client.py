@@ -203,13 +203,12 @@ def delete_session(user_id: int, file_id: str) -> None:
 # Project Helpers
 # ----------------------------
 def create_project_entry(project_data: Dict[str, Any], cursor):
-    cursor.execute(
-        """
+    query = """
         INSERT INTO projects
             (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
         VALUES
             (%(user_id)s, %(file_id)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
-    """
+        """
     cursor.execute(query, project_data)
 
 
@@ -262,9 +261,9 @@ def get_active_llm_settings_for_user(
         FROM user_llm_settings s
         LEFT JOIN provider_endpoint p ON s.provider = p.identifier
         WHERE s.user_id = %s ORDER BY s.updated_at DESC LIMIT 1;
-        """,
-        (user_id,),
-    )
+        """
+    cursor.execute(query, (user_id,))
+
     settings = cursor.fetchone()
     if settings:
         settings = dict(settings)
