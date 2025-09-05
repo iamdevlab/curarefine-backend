@@ -19,6 +19,12 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
 # ==== Connection Pool ====
 # This pool is created once and shared by the application.
 try:
+
+    print("Trying to connect to Postgres with:")
+    print("  HOST:", DB_HOST)
+    print("  PORT:", DB_PORT)
+    print("  DB:", DB_NAME)
+    print("  USER:", DB_USER)
     connection_pool = pool.SimpleConnectionPool(
         1,  # minconn
         20,  # maxconn
