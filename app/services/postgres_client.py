@@ -22,7 +22,6 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
 # ==== Connection Pool ====
 # This pool is created once and shared by the application.
 try:
-
     print("Trying to connect to Postgres with:")
     print("  HOST:", DB_HOST)
     print("  PORT:", DB_PORT)
@@ -37,8 +36,10 @@ try:
         user=DB_USER,
         password=DB_PASSWORD,
     )
-except psycopg2.OperationalError as e:
-    print(f"Error creating connection pool: {e}")
+    print("Successfully connected to Postgres")
+except (psycopg2.OperationalError, Exception) as e:
+    print(f"Warning: Could not connect to PostgreSQL: {e}")
+    print("Application will run with limited functionality (no data persistence)")
     connection_pool = None
 
 
@@ -47,7 +48,8 @@ def get_connection():
     """Gets a connection from the pool."""
     if connection_pool:
         return connection_pool.getconn()
-    raise Exception("Connection pool is not available.")
+    print("Warning: No database connection available - using fallback mode")
+    return None
 
 
 def release_connection(conn):
@@ -63,6 +65,9 @@ def init_db() -> None:
     conn = None
     try:
         conn = get_connection()
+        if conn is None:
+            print("Warning: Skipping database initialization - no connection available")
+            return
         with conn.cursor() as cursor:
             # (Schema queries are omitted for brevity, but belong here)
             schema_queries = [

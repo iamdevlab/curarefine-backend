@@ -17,9 +17,16 @@ DEFAULT_EXPIRE = 3600  # seconds, 1 hour
 # --------------------
 # Redis Client
 # --------------------
-redis_client = redis.Redis(
-    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
-)
+try:
+    redis_client = redis.Redis(
+        host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
+    )
+    # Test the connection
+    redis_client.ping()
+    print(f"Successfully connected to Redis at {REDIS_HOST}:{REDIS_PORT}")
+except Exception as e:
+    print(f"Warning: Could not connect to Redis: {e}")
+    redis_client = None
 
 
 # --------------------
@@ -28,10 +35,13 @@ redis_client = redis.Redis(
 def init_redis():
     """Check Redis connection on startup"""
     try:
-        redis_client.ping()
-        print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
-    except redis.ConnectionError:
-        print("[Redis] Connection failed! Make sure the Redis server is running.")
+        if redis_client:
+            redis_client.ping()
+            print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
+        else:
+            print("[Redis] Client not available - running without cache")
+    except Exception as e:
+        print(f"[Redis] Connection check failed: {e}")
 
 
 # --------------------
@@ -41,6 +51,9 @@ def set_session(
     user_id: int, file_id: str, session_data: dict, expire_seconds: int = DEFAULT_EXPIRE
 ):
     """Store session in Redis with expiration"""
+    if redis_client is None:
+        print("Warning: Cannot store session - Redis not available")
+        return
     key = f"session:{user_id}:{file_id}"
     redis_client.set(
         key, json.dumps(session_data, default=to_python_type), ex=expire_seconds
@@ -49,6 +62,9 @@ def set_session(
 
 def get_session(user_id: int, file_id: str) -> dict:
     """Retrieve session from Redis"""
+    if redis_client is None:
+        print("Warning: Cannot retrieve session - Redis not available")
+        return None
     key = f"session:{user_id}:{file_id}"
     data = redis_client.get(key)
     return json.loads(data) if data else None
