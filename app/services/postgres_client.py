@@ -8,11 +8,9 @@ from typing import Optional, Dict, Any, List
 from psycopg2 import pool
 from app.services.encryption_service import encrypt, decrypt
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
 # ==== Database Config ====
-# DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
-DB_HOST = os.getenv("POSTGRES_HOST", DATABASE_URL)  # Use DATABASE_URL if available
+DATABASE_URL = os.environ.get("DATABASE_URL")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "postgres")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
@@ -22,20 +20,31 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
 # ==== Connection Pool ====
 # This pool is created once and shared by the application.
 try:
-    print("Trying to connect to Postgres with:")
-    print("  HOST:", DB_HOST)
-    print("  PORT:", DB_PORT)
-    print("  DB:", DB_NAME)
-    print("  USER:", DB_USER)
-    connection_pool = pool.SimpleConnectionPool(
-        1,  # minconn
-        20,  # maxconn
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-    )
+    print("Trying to connect to Postgres...")
+    
+    # Try DATABASE_URL first if available
+    if DATABASE_URL and DATABASE_URL.startswith('postgresql://'):
+        print(f"Using DATABASE_URL connection")
+        connection_pool = pool.SimpleConnectionPool(
+            1,  # minconn
+            20,  # maxconn
+            DATABASE_URL
+        )
+    else:
+        print("Using individual connection parameters:")
+        print("  HOST:", DB_HOST)
+        print("  PORT:", DB_PORT)
+        print("  DB:", DB_NAME)
+        print("  USER:", DB_USER)
+        connection_pool = pool.SimpleConnectionPool(
+            1,  # minconn
+            20,  # maxconn
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+        )
     print("Successfully connected to Postgres")
 except (psycopg2.OperationalError, Exception) as e:
     print(f"Warning: Could not connect to PostgreSQL: {e}")
