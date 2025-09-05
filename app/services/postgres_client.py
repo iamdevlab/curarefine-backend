@@ -8,8 +8,11 @@ from typing import Optional, Dict, Any, List
 from psycopg2 import pool
 from app.services.encryption_service import encrypt, decrypt
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
 # ==== Database Config ====
-DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+# DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_HOST = os.getenv("POSTGRES_HOST", DATABASE_URL)  # Use DATABASE_URL if available
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "postgres")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
