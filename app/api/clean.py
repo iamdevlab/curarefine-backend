@@ -13,12 +13,10 @@ from app.services.data_cleaner import DataCleaner
 
 
 from app.services.postgres_client import (
-    save_cleaning_log,
     create_session,
     get_session as pg_get_session,
     delete_session as pg_delete_session,
     get_connection,
-    create_session,
     update_project_status,
 )
 from app.services.redis_client import (
