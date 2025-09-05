@@ -1,70 +1,76 @@
 # postgres_client.py
 import os
 import json
-import psycopg2
-from psycopg2.extras import RealDictCursor
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from psycopg2 import pool
+
 from app.services.encryption_service import encrypt, decrypt
 
+# ----------------------------
+# Environment Variables
+# ----------------------------
 DATABASE_URL = os.environ.get("DATABASE_URL")
-
-# ==== Database Config ====
-# DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
-DB_HOST = os.getenv("POSTGRES_HOST", DATABASE_URL)  # Use DATABASE_URL if available
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "postgres")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
 
-
-# ==== Connection Pool ====
-# This pool is created once and shared by the application.
+# ----------------------------
+# Connection Pool (Hybrid)
+# ----------------------------
 try:
-
-    print("Trying to connect to Postgres with:")
-    print("  HOST:", DB_HOST)
-    print("  PORT:", DB_PORT)
-    print("  DB:", DB_NAME)
-    print("  USER:", DB_USER)
-    connection_pool = pool.SimpleConnectionPool(
-        1,  # minconn
-        20,  # maxconn
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-    )
-except psycopg2.OperationalError as e:
-    print(f"Error creating connection pool: {e}")
+    if DATABASE_URL:
+        # Use cloud or Replit
+        connection_pool = pool.SimpleConnectionPool(
+            minconn=1, maxconn=20, dsn=DATABASE_URL, cursor_factory=RealDictCursor
+        )
+        print("[Postgres] Using DATABASE_URL connection pool")
+    else:
+        # Use local Postgres
+        connection_pool = pool.SimpleConnectionPool(
+            minconn=1,
+            maxconn=20,
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            cursor_factory=RealDictCursor,
+        )
+        print("[Postgres] Using local Postgres connection pool")
+except Exception as e:
+    print(f"[Postgres] Failed to create connection pool: {e}")
     connection_pool = None
 
 
-# ==== Connection Helpers ====
+# ----------------------------
+# Connection Helpers
+# ----------------------------
 def get_connection():
-    """Gets a connection from the pool."""
     if connection_pool:
         return connection_pool.getconn()
-    raise Exception("Connection pool is not available.")
+    raise Exception("Postgres connection pool not available")
 
 
 def release_connection(conn):
-    """Returns a connection to the pool."""
     if connection_pool:
         connection_pool.putconn(conn)
 
 
-# ==== Schema Init ====
+# ----------------------------
+# Schema Initialization
+# ----------------------------
 def init_db() -> None:
     """Create tables if they do not exist."""
-    # This function uses a single connection to run all schema queries.
     conn = None
     try:
         conn = get_connection()
         with conn.cursor() as cursor:
-            # (Schema queries are omitted for brevity, but belong here)
             schema_queries = [
                 """
                 CREATE TABLE IF NOT EXISTS users (
@@ -76,7 +82,6 @@ def init_db() -> None:
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                 );
                 """,
-                # ... include all your other CREATE TABLE statements here ...
                 """
                 CREATE TABLE IF NOT EXISTS projects (
                     id SERIAL PRIMARY KEY,
@@ -104,27 +109,40 @@ def init_db() -> None:
                     CONSTRAINT user_llm_settings_user_provider_key UNIQUE (user_id, provider)
                 );
                 """,
+                """
+                CREATE TABLE IF NOT EXISTS cleaning_sessions (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    file_id VARCHAR(255) NOT NULL,
+                    session_data JSONB,
+                    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                    UNIQUE(user_id, file_id)
+                );
+                """,
             ]
             for query in schema_queries:
                 cursor.execute(query)
             conn.commit()
+            print("[Postgres] Schema initialized successfully")
     finally:
         if conn:
             release_connection(conn)
 
 
-# ==== User Management ====
-# This function takes a cursor, so it's used within another transaction. No change needed.
+# ----------------------------
+# User Management
+# ----------------------------
 def get_user_by_username(
-    username: str,
-    cursor: RealDictCursor,
+    username: str, cursor: RealDictCursor
 ) -> Optional[Dict[str, Any]]:
     query = "SELECT id, username, hashed_password FROM users WHERE username = %s;"
     cursor.execute(query, (username,))
     return cursor.fetchone()
 
 
-# ==== Cleaning Sessions ====
+# ----------------------------
+# Cleaning Sessions
+# ----------------------------
 def create_session(user_id: int, file_id: str, session_data: Dict[str, Any]) -> None:
     conn = None
     try:
@@ -173,8 +191,9 @@ def delete_session(user_id: int, file_id: str) -> None:
             release_connection(conn)
 
 
-# ==== Functions that take a cursor (no changes needed) ====
-# These are helper functions intended to be part of a larger transaction in an API route.
+# ----------------------------
+# Project Helpers
+# ----------------------------
 def create_project_entry(project_data: Dict[str, Any], cursor):
     query = """
         INSERT INTO projects
@@ -185,6 +204,14 @@ def create_project_entry(project_data: Dict[str, Any], cursor):
     cursor.execute(query, project_data)
 
 
+def update_project_status(user_id: int, file_id: str, new_status: str, cursor):
+    query = "UPDATE projects SET status = %s WHERE user_id = %s AND file_id = %s;"
+    cursor.execute(query, (new_status, user_id, file_id))
+
+
+# ----------------------------
+# LLM Settings
+# ----------------------------
 def save_llm_settings(user_id: int, settings: dict, cursor):
     provider = settings.get("provider")
     encrypted_api_key = encrypt(settings.get("api_key"))
@@ -202,12 +229,6 @@ def save_llm_settings(user_id: int, settings: dict, cursor):
     )
 
 
-def update_project_status(user_id: int, file_id: str, new_status: str, cursor):
-    query = "UPDATE projects SET status = %s WHERE user_id = %s AND file_id = %s;"
-    cursor.execute(query, (new_status, user_id, file_id))
-
-
-# ==== Functions that manage their own connection ====
 def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
     conn = None
     try:
@@ -226,7 +247,6 @@ def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
 def get_active_llm_settings_for_user(
     user_id: int, cursor: RealDictCursor
 ) -> Optional[Dict[str, Any]]:
-    # This function is intended to be used within a transaction, so it takes a cursor. No change needed.
     query = """
         SELECT s.provider, s.api_key, s.model_id,
                COALESCE(s.endpoint_url, p.default_endpoint_url) AS final_endpoint_url
@@ -245,8 +265,10 @@ def get_active_llm_settings_for_user(
     return None
 
 
+# ----------------------------
+# Project Queries
+# ----------------------------
 def get_projects_for_user(user_id: int, cursor) -> List[Dict[str, Any]]:
-    # This function is intended to be used within a transaction, so it takes a cursor. No change needed.
     query = """
         SELECT id, file_id, project_name, status, row_count, upload_time 
         FROM projects WHERE user_id = %s ORDER BY upload_time DESC;
@@ -256,7 +278,6 @@ def get_projects_for_user(user_id: int, cursor) -> List[Dict[str, Any]]:
 
 
 def get_dashboard_insights(user_id: int, cursor) -> Dict[str, Any]:
-    # This function is intended to be used within a transaction, so it takes a cursor. No change needed.
     query_missing = """
         SELECT COUNT(*) FROM projects
         WHERE user_id = %s AND missing_values_count > 0
