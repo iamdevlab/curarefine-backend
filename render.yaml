@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: curarefine-backend
+    env: python
+    pythonVersion: "3.11" # Specify your Python version
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: curarefine-db # We will create this in the next step
+          property: host
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: curarefine-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: curarefine-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: curarefine-db
+          property: password
+      - key: ENCRYPTION_KEY
+        sync: false 
