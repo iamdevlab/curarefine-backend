@@ -28,7 +28,11 @@ def get_redis_client():
                 redis_client = redis.from_url(REDIS_URL, decode_responses=True)
             else:
                 redis_client = redis.Redis(
-                    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
+                    host=REDIS_HOST,
+                    port=REDIS_PORT,
+                    db=REDIS_DB,
+                    decode_responses=True,
+                    ssl=True,
                 )
             redis_client.ping()
             print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
