@@ -73,6 +73,11 @@ def init_db() -> None:
     conn = None
     try:
         conn = get_connection()
+        # --- Start of fix ---
+        if not conn:
+            print("[Postgres] Cannot initialize schema, no connection available.")
+            return
+        # --- End of fix ---
         with conn.cursor() as cursor:
             schema_queries = [
                 """
@@ -128,7 +133,9 @@ def init_db() -> None:
             conn.commit()
             print("[Postgres] Schema initialized successfully")
     finally:
-        release_connection(conn)
+        # Check if conn is not None before trying to release it
+        if conn:
+            release_connection(conn)
 
 
 # ----------------------------
