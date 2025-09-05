@@ -9,7 +9,7 @@ REDIS_URL = os.getenv("REDIS_URL")
 # --------------------
 # Redis Configuration
 # --------------------
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_HOST = os.getenv("REDIS_HOST", REDIS_URL)
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
 DEFAULT_EXPIRE = 3600  # seconds, 1 hour
@@ -17,36 +17,21 @@ DEFAULT_EXPIRE = 3600  # seconds, 1 hour
 # --------------------
 # Redis Client
 # --------------------
-# redis_client = redis.Redis(
-#     host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
-# )
-redis_client = (
-    redis.from_url(REDIS_URL, decode_responses=True)
+redis_client = redis.Redis(
+    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
+)
+
 
 # --------------------
 # Initialization
 # --------------------
 def init_redis():
-     """Check Redis connection on startup"""
+    """Check Redis connection on startup"""
     try:
-        if not REDIS_URL:
-            print("[Redis] REDIS_URL environment variable is not set.")
-            return
-
         redis_client.ping()
-        # Get host for display purposes
-        host = redis_client.connection_pool.connection_kwargs.get('host')
-        port = redis_client.connection_pool.connection_kwargs.get('port')
-        print(f"[Redis] Connected at {host}:{port}")
-
-    except redis.ConnectionError as e:
-        print(f"[Redis] Connection failed! Error: {e}")
-    # """Check Redis connection on startup"""
-    # try:
-    #     redis_client.ping()
-    #     print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
-    # except redis.ConnectionError:
-    #     print("[Redis] Connection failed! Make sure the Redis server is running.")
+        print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
+    except redis.ConnectionError:
+        print("[Redis] Connection failed! Make sure the Redis server is running.")
 
 
 # --------------------
