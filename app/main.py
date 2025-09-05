@@ -36,11 +36,7 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-origins = [
-    "http://localhost:3000",  # For local development
-    "http://localhost:5173",  # For local Vite development
-    "https://curarefine.netlify.app",  # Production URL
-]
+origins = ["*"]  # Allow all origins for Replit environment
 
 # Add CORS middleware
 app.add_middleware(
@@ -156,4 +152,4 @@ async def internal_error_handler(request, exc):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)

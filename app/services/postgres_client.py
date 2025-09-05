@@ -15,6 +15,7 @@ from app.services.encryption_service import encrypt, decrypt
 # ----------------------------
 DATABASE_URL = os.environ.get("DATABASE_URL")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 DB_NAME = os.getenv("POSTGRES_DB", "postgres")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
@@ -54,6 +55,8 @@ except Exception as e:
 def get_connection():
     if connection_pool:
         return connection_pool.getconn()
+    print("Warning: No database connection available - using fallback mode")
+    return None
     raise Exception("Postgres connection pool not available")
 
 
@@ -125,8 +128,7 @@ def init_db() -> None:
             conn.commit()
             print("[Postgres] Schema initialized successfully")
     finally:
-        if conn:
-            release_connection(conn)
+        release_connection(conn)
 
 
 # ----------------------------
@@ -135,8 +137,10 @@ def init_db() -> None:
 def get_user_by_username(
     username: str, cursor: RealDictCursor
 ) -> Optional[Dict[str, Any]]:
-    query = "SELECT id, username, hashed_password FROM users WHERE username = %s;"
-    cursor.execute(query, (username,))
+    cursor.execute(
+        "SELECT id, username, hashed_password FROM users WHERE username = %s;",
+        (username,),
+    )
     return cursor.fetchone()
 
 
@@ -144,58 +148,63 @@ def get_user_by_username(
 # Cleaning Sessions
 # ----------------------------
 def create_session(user_id: int, file_id: str, session_data: Dict[str, Any]) -> None:
-    conn = None
+    conn = get_connection()
+    if not conn:
+        return
     try:
-        conn = get_connection()
         with conn.cursor() as cursor:
-            query = """
+            cursor.execute(
+                """
                 INSERT INTO cleaning_sessions (user_id, file_id, session_data, last_updated)
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (user_id, file_id)
                 DO UPDATE SET session_data = EXCLUDED.session_data,
                               last_updated = EXCLUDED.last_updated;
-            """
-            cursor.execute(
-                query, (user_id, file_id, json.dumps(session_data), datetime.now())
+                """,
+                (user_id, file_id, json.dumps(session_data), datetime.now()),
             )
         conn.commit()
     finally:
-        if conn:
-            release_connection(conn)
+        release_connection(conn)
 
 
 def get_session(user_id: int, file_id: str) -> Optional[Dict[str, Any]]:
-    conn = None
+    conn = get_connection()
+    if not conn:
+        return None
     try:
-        conn = get_connection()
         with conn.cursor() as cursor:
-            query = "SELECT session_data FROM cleaning_sessions WHERE user_id = %s AND file_id = %s;"
-            cursor.execute(query, (user_id, file_id))
+            cursor.execute(
+                "SELECT session_data FROM cleaning_sessions WHERE user_id = %s AND file_id = %s;",
+                (user_id, file_id),
+            )
             result = cursor.fetchone()
             return result[0] if result else None
     finally:
-        if conn:
-            release_connection(conn)
+        release_connection(conn)
 
 
 def delete_session(user_id: int, file_id: str) -> None:
-    conn = None
+    conn = get_connection()
+    if not conn:
+        return
     try:
-        conn = get_connection()
         with conn.cursor() as cursor:
-            query = "DELETE FROM cleaning_sessions WHERE user_id = %s AND file_id = %s;"
-            cursor.execute(query, (user_id, file_id))
+            cursor.execute(
+                "DELETE FROM cleaning_sessions WHERE user_id = %s AND file_id = %s;",
+                (user_id, file_id),
+            )
         conn.commit()
     finally:
-        if conn:
-            release_connection(conn)
+        release_connection(conn)
 
 
 # ----------------------------
 # Project Helpers
 # ----------------------------
 def create_project_entry(project_data: Dict[str, Any], cursor):
-    query = """
+    cursor.execute(
+        """
         INSERT INTO projects
             (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
         VALUES
@@ -217,31 +226,31 @@ def save_llm_settings(user_id: int, settings: dict, cursor):
     encrypted_api_key = encrypt(settings.get("api_key"))
     model_id = settings.get("model_id")
     endpoint_url = settings.get("endpoint_url")
-    query = """
+    cursor.execute(
+        """
         INSERT INTO user_llm_settings (user_id, provider, api_key, model_id, endpoint_url, updated_at)
         VALUES (%s, %s, %s, %s, %s, NOW())
         ON CONFLICT (user_id, provider)
         DO UPDATE SET api_key = EXCLUDED.api_key, model_id = EXCLUDED.model_id,
                       endpoint_url = EXCLUDED.endpoint_url, updated_at = NOW();
-    """
-    cursor.execute(
-        query, (user_id, provider, encrypted_api_key, model_id, endpoint_url)
+        """,
+        (user_id, provider, encrypted_api_key, model_id, endpoint_url),
     )
 
 
 def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
-    conn = None
+    conn = get_connection()
+    if not conn:
+        return []
     try:
-        conn = get_connection()
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            query = (
-                "SELECT provider, model_id FROM user_llm_settings WHERE user_id = %s;"
+            cursor.execute(
+                "SELECT provider, model_id FROM user_llm_settings WHERE user_id = %s;",
+                (user_id,),
             )
-            cursor.execute(query, (user_id,))
             return cursor.fetchall()
     finally:
-        if conn:
-            release_connection(conn)
+        release_connection(conn)
 
 
 def get_active_llm_settings_for_user(
@@ -253,14 +262,14 @@ def get_active_llm_settings_for_user(
         FROM user_llm_settings s
         LEFT JOIN provider_endpoint p ON s.provider = p.identifier
         WHERE s.user_id = %s ORDER BY s.updated_at DESC LIMIT 1;
-    """
-    cursor.execute(query, (user_id,))
+        """,
+        (user_id,),
+    )
     settings = cursor.fetchone()
     if settings:
         settings = dict(settings)
-        encrypted_api_key = settings.get("api_key")
-        if encrypted_api_key:
-            settings["api_key"] = decrypt(encrypted_api_key)
+        if settings.get("api_key"):
+            settings["api_key"] = decrypt(settings["api_key"])
         return settings
     return None
 
@@ -286,18 +295,16 @@ def get_dashboard_insights(user_id: int, cursor) -> Dict[str, Any]:
     cursor.execute(query_missing, (user_id,))
     missing_values_count = cursor.fetchone()["count"]
 
-    query_outliers = """
-        SELECT COUNT(*) FROM projects
-        WHERE user_id = %s AND outlier_count > 0
-        AND upload_time >= NOW() - INTERVAL '7 days';
-    """
-    cursor.execute(query_outliers, (user_id,))
+    cursor.execute(
+        "SELECT COUNT(*) FROM projects WHERE user_id = %s AND outlier_count > 0 AND upload_time >= NOW() - INTERVAL '7 days';",
+        (user_id,),
+    )
     outliers_detected_count = cursor.fetchone()["count"]
 
-    query_avg_size = (
-        "SELECT AVG(row_count) as avg_size FROM projects WHERE user_id = %s;"
+    cursor.execute(
+        "SELECT AVG(row_count) as avg_size FROM projects WHERE user_id = %s;",
+        (user_id,),
     )
-    cursor.execute(query_avg_size, (user_id,))
     avg_result = cursor.fetchone()["avg_size"]
     average_dataset_size = int(avg_result) if avg_result is not None else 0
 

@@ -6,28 +6,32 @@ import json
 from app.services.data_cleaner import to_python_type
 
 # ----------------------------
-# Environment Variables
+# Redis Configuration
 # ----------------------------
 REDIS_URL = os.getenv("REDIS_URL")
-DEFAULT_EXPIRE = 3600  # 1 hour
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB = int(os.getenv("REDIS_DB", 0))
+DEFAULT_EXPIRE = 3600  # seconds, 1 hour
 
 # ----------------------------
-# Lazy Redis Client
+# Redis Client (Lazy/Hybrid)
 # ----------------------------
-redis_client = None  # lazy initialization
+redis_client = None  # Lazy init
 
 
 def get_redis_client():
-    """Return Redis client, initialize if needed."""
     global redis_client
     if redis_client is None:
-        if not REDIS_URL:
-            print("[Redis] REDIS_URL not set, skipping Redis")
-            return None
         try:
-            redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+            if REDIS_URL:
+                redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+            else:
+                redis_client = redis.Redis(
+                    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True
+                )
             redis_client.ping()
-            print("[Redis] Connected successfully")
+            print(f"[Redis] Connected at {REDIS_HOST}:{REDIS_PORT}, DB {REDIS_DB}")
         except redis.ConnectionError as e:
             print(f"[Redis] Connection failed: {e}")
             redis_client = None
@@ -38,12 +42,12 @@ def get_redis_client():
 # Legacy init_redis() for compatibility
 # ----------------------------
 def init_redis():
-    """Legacy startup function - initialize Redis and test connection."""
+    """Check Redis connection on startup"""
     client = get_redis_client()
     if client:
-        print("[Redis] Initialized successfully")
+        print("[Redis] Ready to use")
     else:
-        print("[Redis] Not available")
+        print("[Redis] Not available, skipping Redis operations")
 
 
 # ----------------------------
@@ -52,6 +56,7 @@ def init_redis():
 def set_session(
     user_id: int, file_id: str, session_data: dict, expire_seconds=DEFAULT_EXPIRE
 ):
+    """Store session in Redis with expiration"""
     client = get_redis_client()
     if not client:
         return
@@ -60,6 +65,7 @@ def set_session(
 
 
 def get_session(user_id: int, file_id: str):
+    """Retrieve session from Redis"""
     client = get_redis_client()
     if not client:
         return None
