@@ -16,15 +16,6 @@ router = APIRouter(tags=["dashboard"])
 
 
 # --- Dependency for getting a database cursor ---
-def get_db_cursor():
-    conn = None
-    try:
-        conn = get_connection()
-        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            yield cursor
-    finally:
-        if conn:
-            conn.close()
 
 
 @router.get("/dashboard")
