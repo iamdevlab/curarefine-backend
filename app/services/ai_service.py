@@ -1,25 +1,22 @@
-from fastapi import APIRouter, HTTPException
+import json
+import re
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Dict, List, Any, Optional
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from app.services.external_ai_service import generate_external_recommendations
-from app.services.postgres_client import (
-    get_connection,
-    get_active_llm_settings_for_user,
-)
 from psycopg2.extras import RealDictCursor
-import re
-import json
-from app.deep_analysis.outlier_detector import OutlierDetector
-from app.services.security import get_current_user
-from fastapi import Depends
 
-# Import cleaning components
 from app.api.clean import get_or_create_cleaner
+from app.deep_analysis.outlier_detector import OutlierDetector
 from app.services.data_cleaner import DataCleaner
+from app.services.external_ai_service import generate_external_recommendations
+from app.services.db_queries import get_active_llm_settings_for_user
+from app.services.postgres_client import get_connection
+from app.services.security import get_current_user
 
 router = APIRouter(prefix="/ai", tags=["ai-assistance"])
 

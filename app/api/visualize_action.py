@@ -1,14 +1,13 @@
 # app/api/visualize_action.py
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
-from typing import List, Dict, Any
 import logging
+from typing import Any, Dict, List
 
-# --- FIX 1: Import the real service from visualizer.py ---
-# This was incorrectly pointing to visualize_api.py
-from app.visualize.visualizer import VisualizationService
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
 from app.services.security import get_current_user
+from app.visualize.visualizer import VisualizationService
 
 
 # Pydantic model for request body validation

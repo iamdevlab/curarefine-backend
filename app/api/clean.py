@@ -1,29 +1,28 @@
 # app/routers/cleaning.py
-from fastapi import APIRouter, HTTPException, Query, Depends
-from pydantic import BaseModel
-from typing import Dict, List, Any, Optional
-from pathlib import Path
-import pandas as pd
-import traceback
-import numpy as np
 import json
-from app.services.security import get_current_user
+import traceback
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 
 from app.services.data_cleaner import DataCleaner
-
-
-from app.services.postgres_client import (
+from app.services.db_queries import (
     create_session,
-    get_session as pg_get_session,
     delete_session as pg_delete_session,
-    get_connection,
+    get_session as pg_get_session,
     update_project_status,
 )
+from app.services.postgres_client import get_connection
 from app.services.redis_client import (
-    set_session,
-    get_session as redis_get_session,
     delete_session as redis_delete_session,
+    get_session as redis_get_session,
+    set_session,
 )
+from app.services.security import get_current_user
 
 router = APIRouter(prefix="/clean", tags=["cleaning"])
 UPLOAD_DIR = Path("uploads")

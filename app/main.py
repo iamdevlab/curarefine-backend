@@ -1,30 +1,35 @@
-from dotenv import load_dotenv
-
-load_dotenv()
 import asyncio
-from app.services.postgres_client import init_db_async
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import uvicorn
-from pathlib import Path
 import os
-from app.api.upload import router as upload_router
-from app.api.clean import router as clean_router
-from app.api.export import router as export_router
+from pathlib import Path
+
+# Third-Party Libraries
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import uvicorn
+
+# --- Local Application Imports ---
+# Initialize environment variables first
+load_dotenv()
+
+# Import all the API routers
 from app.services.ai_service import router as ai_service_router
 from app.api.ai_settings import router as ai_settings_router
-from app.routers import pipeline
-from fastapi.staticfiles import StaticFiles
-from app.services.data_cleaner import DataCleaner
-from app.services.postgres_client import init_db
+from app.api.auth import router as auth_router
+from app.api.clean import router as clean_router
+from app.api.dashboard import router as dashboard_router
+from app.api.export import router as export_router
+
+# from app.deep_analysis.pipeline import router as pipeline_router
+from app.api.upload import router as upload_router
+from app.api.users import router as users_router
+from app.api.visualize_action import router as visualize_action_router
+
+# Import services and utilities
+from app.services.postgres_client import init_db_async
 from app.services.redis_client import init_redis
 from app.utils.json_response import CustomJSONResponse as JSONResponse
-from app.api import dashboard
-from app.api import visualize_action
-from app.api.auth import router as auth_router
-from app.api.users import router as users_router
-
 
 # Create FastAPI app
 app = FastAPI(
@@ -61,9 +66,9 @@ app.include_router(export_router, prefix="/api")
 app.include_router(ai_service_router, prefix="/api")
 # This includes the new endpoints like /ai/providers and /ai/settings
 app.include_router(ai_settings_router, prefix="/api")
-app.include_router(pipeline.router, prefix="/api")
-app.include_router(dashboard.router, prefix="/api")
-app.include_router(visualize_action.router, prefix="/api")
+# app.include_router(pipeline.router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
+app.include_router(visualize_action_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 

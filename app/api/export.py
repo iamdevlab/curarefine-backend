@@ -1,20 +1,21 @@
 # app/api/export.py
-from fastapi import APIRouter, HTTPException, Response, Depends
-from pydantic import BaseModel
-from typing import Dict, List, Any, Optional
-import pandas as pd
 import io
 import json
-from pathlib import Path
+import os
+import tempfile
 import zipfile
 from datetime import datetime
-import tempfile
-import os
-from app.services.postgres_client import get_connection, update_project_status
-from app.services.security import get_current_user  # NEW: Import auth dependency
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# UPDATED: Import only get_or_create_cleaner
-from .clean import get_or_create_cleaner
+import pandas as pd
+from fastapi import APIRouter, Depends, HTTPException, Response
+from pydantic import BaseModel
+
+from app.api.clean import get_or_create_cleaner
+from app.services.db_queries import update_project_status
+from app.services.postgres_client import get_connection
+from app.services.security import get_current_user
 
 router = APIRouter(prefix="/export", tags=["export"])
 

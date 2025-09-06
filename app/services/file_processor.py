@@ -1,11 +1,11 @@
 import pandas as pd
 import io
-import PyPDF2
+
 import docx
 from pathlib import Path
 import chardet
 from typing import Tuple, Dict, Any, List
-import magic
+
 
 from app.models.schemas import FileType, UploadResponse
 
