@@ -1,5 +1,5 @@
 # app/api/auth.py
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from app.services import security
@@ -7,9 +7,6 @@ from app.services.postgres_client import get_user_by_username, get_connection
 from psycopg2.extras import RealDictCursor
 from app.api.dashboard import get_db_cursor
 from pydantic import BaseModel
-
-# In a real app, you'd have a function to get a user from the DB
-# from app.services.db import get_user_by_username
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -23,7 +20,6 @@ class UserCreate(BaseModel):
 
 @router.post("/register")
 async def register_user(user_data: UserCreate):
-    # Check if the username or email already exists
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
@@ -36,10 +32,8 @@ async def register_user(user_data: UserCreate):
                     detail="Username or email already registered",
                 )
 
-        # Hash the password
         hashed_password = security.get_password_hash(user_data.password)
 
-        # Insert the new user into the database
         with conn.cursor() as cursor:
             cursor.execute(
                 """
@@ -53,17 +47,14 @@ async def register_user(user_data: UserCreate):
                     hashed_password,
                 ),
             )
-
     return {"message": "User registered successfully"}
 
 
 @router.post("/token")
 async def login_for_access_token(
-    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    cursor: RealDictCursor = Depends(get_db_cursor),  # Add DB cursor dependency
+    cursor: RealDictCursor = Depends(get_db_cursor),
 ):
-    # --- FIX: Replace the mock user with a real database lookup ---
     user = get_user_by_username(form_data.username, cursor)
 
     if not user or not security.verify_password(
@@ -74,32 +65,25 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    # --- END FIX ---
 
     access_token_expires = timedelta(minutes=security.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = security.create_access_token(
-        data={"sub": str(user["id"])},  # Use the real user ID from the database
+        data={"sub": str(user["id"])},
         expires_delta=access_token_expires,
     )
 
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        samesite="lax",
-        secure=False,  # Set to True in production (HTTPS)
-    )
-    return {"message": "Login successful"}
+    # Return the token in the response body, as expected by the frontend
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/logout")
-async def logout(response: Response):
-    response.delete_cookie(key="access_token")
-    return {"message": "Logout successful"}
+async def logout():
+    # In a token-based system, logout is handled by the client (deleting the token)
+    # This endpoint can remain for completeness if needed
+    return {"message": "Logout successful on client"}
 
 
 @router.get("/users/me")
 async def read_users_me(current_user: dict = Depends(security.get_current_user)):
-    # This endpoint is now protected.
-    # The `get_current_user` dependency will run first.
+    # This endpoint is now correctly protected by the header-based dependency
     return current_user
