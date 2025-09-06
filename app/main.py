@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
-
 load_dotenv()
+import asyncio
 from app.services.postgres_client import init_db_async
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware

@@ -1,0 +1,19 @@
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files
+.env
+.venv/
+venv/
+env/
+
+# Git and IDE files
+.git/
+.gitignore
+.vscode/
+.replit
+build.sh
+render.yaml
+replit.md

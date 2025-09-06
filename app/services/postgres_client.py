@@ -18,7 +18,7 @@ _db_executor = ThreadPoolExecutor(max_workers=2)
 DATABASE_URL = os.environ.get("DATABASE_URL")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
-DB_NAME = os.getenv("POSTGRES_DB", "datacura")
+DB_NAME = os.getenv("POSTGRES_DB", "postgres")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
 
