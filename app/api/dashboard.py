@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from psycopg2.extras import RealDictCursor
 from typing import List, Dict, Any
-from app.services.security import get_current_user
+
+# from app.services.security import get_current_user
+from app.services.postgres_client import get_db_cursor
 
 # --- NEW: Import the get_projects_for_user function ---
 from app.services.postgres_client import (
