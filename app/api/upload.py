@@ -1,16 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Depends
-from fastapi.responses import JSONResponse
-from app.utils.file_parser import read_file_content
-import pandas as pd
 import io
-import uuid
-from typing import List, Optional
-from pathlib import Path
-import os
-from datetime import datetime
-import numpy as np
 import math
-from app.services.postgres_client import get_connection, create_project_entry
+import os
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
+
+import numpy as np
+import pandas as pd
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi.responses import JSONResponse
+
+from app.services.db_queries import create_project_entry
+from app.services.postgres_client import get_connection
 from app.services.security import get_current_user
 
 

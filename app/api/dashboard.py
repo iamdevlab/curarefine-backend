@@ -1,21 +1,13 @@
+# app/api/dashboard.py
+
 from fastapi import APIRouter, Depends, HTTPException
 from psycopg2.extras import RealDictCursor
-from typing import List, Dict, Any
 
-# from app.services.security import get_current_user
+from app.services.db_queries import get_dashboard_insights, get_projects_for_user
 from app.services.postgres_client import get_db_cursor
-
-# --- NEW: Import the get_projects_for_user function ---
-from app.services.postgres_client import (
-    get_connection,
-    get_projects_for_user,
-    get_dashboard_insights,
-)
+from app.services.security import get_current_user
 
 router = APIRouter(tags=["dashboard"])
-
-
-# --- Dependency for getting a database cursor ---
 
 
 @router.get("/dashboard")
@@ -26,14 +18,13 @@ async def get_dashboard_data(
     """
     Endpoint to fetch all data needed for the main dashboard view.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]  # Using corrected key 'id'
     try:
         # --- Fetch the list of recent projects ---
         recent_projects = get_projects_for_user(user_id, cursor)
         insights = get_dashboard_insights(user_id, cursor)
 
-        # --- Categorize projects (Example Logic) ---
-        # This logic can be expanded to be more sophisticated
+        # --- Categorize projects ---
         completed_projects = [p for p in recent_projects if p["status"] == "Completed"]
         pending_projects = [p for p in recent_projects if p["status"] != "Completed"]
 

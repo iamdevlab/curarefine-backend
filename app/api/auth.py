@@ -1,12 +1,14 @@
 # app/api/auth.py
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
-from app.services import security
-from app.services.postgres_client import get_user_by_username, get_connection
-from psycopg2.extras import RealDictCursor
-from app.api.dashboard import get_db_cursor
 from pydantic import BaseModel
+from psycopg2.extras import RealDictCursor
+
+from app.services import security
+from app.services.db_queries import get_user_by_username
+from app.services.postgres_client import get_connection, get_db_cursor
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 

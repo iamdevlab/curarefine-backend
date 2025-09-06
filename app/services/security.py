@@ -1,22 +1,26 @@
 # app/services/security.py
+
+import os
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-import os
 from psycopg2.extras import RealDictCursor
-from app.services.postgres_client import get_user_by_id
+
+# --- Refactored Imports ---
 from app.services.postgres_client import get_db_cursor
+from app.services.db_queries import get_user_by_id
 
 # --- Configuration ---
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
-# --- Password Hashing ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 def verify_password(plain_password, hashed_password):
@@ -27,7 +31,6 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-# --- JWT Creation ---
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -37,12 +40,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-# --- Dependency for Protected Routes (This is the most important part) ---
-
-# This helper will read the token from the 'Authorization: Bearer <token>' header
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 async def get_current_user(
@@ -55,15 +52,16 @@ async def get_current_user(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
             raise credentials_exception
 
-        # Now that we have a user ID, fetch the full user from the database
-        user = get_user_by_id(user_id, cursor)
+        # Using corrected type conversion
+        user = get_user_by_id(int(user_id_str), cursor)
+
         if user is None:
             raise credentials_exception
-        return user  # Return the full user dictionary
+        return user
 
-    except JWTError:
+    except (JWTError, ValueError):
         raise credentials_exception

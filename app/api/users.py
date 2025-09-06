@@ -1,10 +1,10 @@
-# In a new file, e.g., app/api/users.py
+# app/api/users.py
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from app.services.security import get_current_user
-from app.services.postgres_client import get_connection
 from psycopg2.extras import RealDictCursor
-from app.services.security import get_current_user, verify_password, get_password_hash
+
+from app.services.postgres_client import get_connection
+from app.services.security import get_current_user, get_password_hash, verify_password
 
 router = APIRouter(prefix="/users", tags=["users"])
 

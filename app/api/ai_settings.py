@@ -1,21 +1,22 @@
 # app/routers/ai_settings.py
 
-from fastapi import APIRouter, HTTPException, Depends, Header
+import logging
+from typing import Any, Dict, List, Optional
+
+import httpx
+import psycopg2
+from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
-import psycopg2
 from psycopg2.extras import RealDictCursor
-import httpx
-import logging
-from app.services.security import get_current_user
 
-from app.services.postgres_client import (
-    get_connection,
-    save_llm_settings,
-    get_all_llm_settings_for_user,
+from app.services.db_queries import (
     get_active_llm_settings_for_user,
+    get_all_llm_settings_for_user,
+    save_llm_settings,
 )
+from app.services.postgres_client import get_connection
+from app.services.security import get_current_user
 
 # Router setup
 router = APIRouter(prefix="/ai", tags=["ai"])
