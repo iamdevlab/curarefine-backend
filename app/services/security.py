@@ -8,7 +8,7 @@ from typing import Optional
 import os
 from psycopg2.extras import RealDictCursor
 from app.services.postgres_client import get_user_by_id
-from app.api.dashboard import get_db_cursor
+from app.services.postgres_client import get_db_cursor
 
 # --- Configuration ---
 SECRET_KEY = os.getenv("SECRET_KEY")
