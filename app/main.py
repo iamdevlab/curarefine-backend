@@ -38,12 +38,15 @@ app = FastAPI(
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-origins = ["*"]  # Allow all origins for Replit environment
+origins = [
+    "https://curarefine.netlify.app",
+    "http://localhost:8000",  # Keep for local testing
+]  # Allow all origins for Replit environment
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,7 +84,7 @@ async def startup_event():
     """Initialize application on startup"""
     create_directories()
 
-    # Initialize Redis first (it's usually faster)
+    # Initialize Redis first (it's usually faster), s
     init_redis()
 
     # Initialize DB with timeout
