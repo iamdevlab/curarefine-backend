@@ -1,4 +1,5 @@
 # postgres_client.py
+from concurrent.futures import ThreadPoolExecutor
 import os
 import json
 from datetime import datetime
@@ -10,19 +11,28 @@ from psycopg2 import pool
 
 from app.services.encryption_service import encrypt, decrypt
 
+_db_executor = ThreadPoolExecutor(max_workers=2)
 # ----------------------------
 # Environment Variables
 # ----------------------------
 DATABASE_URL = os.environ.get("DATABASE_URL")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
-DB_NAME = os.getenv("POSTGRES_DB", "postgres")
+DB_NAME = os.getenv("POSTGRES_DB", "datacura")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
+
 
 # ----------------------------
 # Connection Pool (Hybrid)
 # ----------------------------
+async def init_db_async():
+    """Async-safe wrapper to run init_db in threadpool"""
+    from starlette.concurrency import run_in_threadpool
+
+    await run_in_threadpool(init_db)
+
+
 try:
     if DATABASE_URL:
         # Use cloud or Replit
@@ -41,11 +51,39 @@ try:
             user=DB_USER,
             password=DB_PASSWORD,
             cursor_factory=RealDictCursor,
+            connect_timeout=5,
         )
         print("[Postgres] Using local Postgres connection pool")
+
+    test_conn = connection_pool.getconn()
+    test_conn.close()
+    connection_pool.putconn(test_conn)
+
 except Exception as e:
     print(f"[Postgres] Failed to create connection pool: {e}")
     connection_pool = None
+
+
+def safe_get_connection():
+    """Get connection with timeout and fallback"""
+    if not connection_pool:
+        print("Warning: No database connection available - using fallback mode")
+        return None
+
+    try:
+        conn = connection_pool.getconn()
+        # Test connection is still valid
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT 1;")
+        return conn
+    except Exception as e:
+        print(f"[Postgres] Connection test failed: {e}")
+        # Try to reconnect
+        try:
+            connection_pool.putconn(conn, close=True)
+        except:
+            pass
+        return None
 
 
 # ----------------------------
@@ -128,13 +166,23 @@ def init_db() -> None:
                 """,
             ]
             for query in schema_queries:
-                cursor.execute(query)
+                try:
+                    cursor.execute(query)
+                except Exception as e:
+                    print(f"[Postgres] Error executing query: {e}")
+                    continue
+
             conn.commit()
             print("[Postgres] Schema initialized successfully")
+
+    except Exception as e:
+        print(f"[Postgres] Error in init_db: {e}")
     finally:
-        # Check if conn is not None before trying to release it
         if conn:
-            release_connection(conn)
+            try:
+                release_connection(conn)
+            except:
+                pass
 
 
 # ----------------------------

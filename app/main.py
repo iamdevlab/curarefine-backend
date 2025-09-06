@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 
+
 load_dotenv()
+from app.services.postgres_client import init_db_async
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -41,7 +43,7 @@ origins = ["*"]  # Allow all origins for Replit environment
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,8 +80,18 @@ def create_directories():
 async def startup_event():
     """Initialize application on startup"""
     create_directories()
-    init_db()  # Initialize the database
-    init_redis()  # Initialize the Redis connection
+
+    # Initialize Redis first (it's usually faster)
+    init_redis()
+
+    # Initialize DB with timeout
+    try:
+        await asyncio.wait_for(init_db_async(), timeout=10.0)
+    except asyncio.TimeoutError:
+        print("[Postgres] Database initialization timed out - continuing without DB")
+    except Exception as e:
+        print(f"[Postgres] Database initialization failed: {e}")
+
     print("Data Cleaning API started...")
 
 
