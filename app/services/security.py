@@ -6,10 +6,12 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import os
+from psycopg2.extras import RealDictCursor
+from app.services.postgres_client import get_user_by_id
+from app.api.dashboard import get_db_cursor
 
 # --- Configuration ---
-# Use environment variables for these in production!
-SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key-that-is-long-and-random")
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
 
@@ -38,29 +40,30 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 
 # --- Dependency for Protected Routes (This is the most important part) ---
-# We will read the token from a cookie instead of the Authorization header
-from fastapi import Request
+
+# This helper will read the token from the 'Authorization: Bearer <token>' header
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
-async def get_current_user(request: Request):
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), cursor: RealDictCursor = Depends(get_db_cursor)
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-            )
-        # In a real app, you would fetch the user from the DB here
-        # For now, we'll just return the user ID
-        return {"user_id": int(user_id)}
+            raise credentials_exception
+
+        # Now that we have a user ID, fetch the full user from the database
+        user = get_user_by_id(user_id, cursor)
+        if user is None:
+            raise credentials_exception
+        return user  # Return the full user dictionary
+
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-        )
+        raise credentials_exception

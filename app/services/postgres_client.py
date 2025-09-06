@@ -185,6 +185,15 @@ def init_db() -> None:
                 pass
 
 
+def get_user_by_id(user_id: int, cursor):
+    """Fetch a single user by their ID."""
+    cursor.execute(
+        "SELECT id, username, full_name, email FROM users WHERE id = %s", (user_id,)
+    )
+    user = cursor.fetchone()
+    return user
+
+
 # ----------------------------
 # User Management
 # ----------------------------
