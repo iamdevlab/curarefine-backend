@@ -19,6 +19,7 @@ DEFAULT_EXPIRE = 3600  # seconds, 1 hour
 redis_client = None
 
 
+# Lazy initialization of the Upstash Redis client
 def get_redis_client():
     global redis_client
     if redis_client is None:
