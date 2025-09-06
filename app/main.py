@@ -101,7 +101,7 @@ async def status_check():
     return JSONResponse(
         {
             "status": "online",
-            "message": "Data Cleaning API is running",
+            "message": "Data Cleaning API is running via automated CI/CD!",
             "routes": {
                 "upload": {
                     "POST /upload/file": "Upload a new data file",
