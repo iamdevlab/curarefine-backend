@@ -1,105 +1,74 @@
-# postgres_client.py
-from concurrent.futures import ThreadPoolExecutor
+# app/services/postgres_client.py
+
 import os
 import json
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+from fastapi import HTTPException
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 from psycopg2 import pool
+from psycopg2.extras import RealDictCursor
 
 from app.services.encryption_service import encrypt, decrypt
 
-_db_executor = ThreadPoolExecutor(max_workers=2)
-# ----------------------------
-# Environment Variables
-# ----------------------------
-DATABASE_URL = os.environ.get("DATABASE_URL")
-DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
-DB_PORT = os.getenv("POSTGRES_PORT", "5432")
-DB_NAME = os.getenv("POSTGRES_DB", "postgres")
-DB_USER = os.getenv("POSTGRES_USER", "postgres")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "hydrogen")
+# --- Connection Pool ---
+connection_pool = None
 
 
-# ----------------------------
-# Connection Pool (Hybrid)
-# ----------------------------
-async def init_db_async():
-    """Async-safe wrapper to run init_db in threadpool"""
-    from starlette.concurrency import run_in_threadpool
-
-    await run_in_threadpool(init_db)
-
-
-try:
-    if DATABASE_URL:
-        # Use cloud or Replit
-        connection_pool = pool.SimpleConnectionPool(
-            minconn=1, maxconn=20, dsn=DATABASE_URL, cursor_factory=RealDictCursor
-        )
-        print("[Postgres] Using DATABASE_URL connection pool")
-    else:
-        # Use local Postgres
-        connection_pool = pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=20,
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            cursor_factory=RealDictCursor,
-            connect_timeout=5,
-        )
-        print("[Postgres] Using local Postgres connection pool")
-
-    test_conn = connection_pool.getconn()
-    test_conn.close()
-    connection_pool.putconn(test_conn)
-
-except Exception as e:
-    print(f"[Postgres] Failed to create connection pool: {e}")
-    connection_pool = None
-
-
-def safe_get_connection():
-    """Get connection with timeout and fallback"""
-    if not connection_pool:
-        print("Warning: No database connection available - using fallback mode")
-        return None
-
-    try:
-        conn = connection_pool.getconn()
-        # Test connection is still valid
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT 1;")
-        return conn
-    except Exception as e:
-        print(f"[Postgres] Connection test failed: {e}")
-        # Try to reconnect
+def init_db_pool():
+    """Initializes the database connection pool. Should be called on startup."""
+    global connection_pool
+    if connection_pool is None:
         try:
-            connection_pool.putconn(conn, close=True)
-        except:
-            pass
-        return None
+            db_url = os.getenv("DATABASE_URL")
+            if not db_url:
+                raise ValueError("DATABASE_URL environment variable not set.")
+            connection_pool = pool.SimpleConnectionPool(
+                minconn=1, maxconn=10, dsn=db_url
+            )
+            print("[Postgres] Connection pool created successfully.")
+        except Exception as e:
+            print(f"[Postgres] Failed to create connection pool: {e}")
+            connection_pool = None
 
 
-# ----------------------------
-# Connection Helpers
-# ----------------------------
+# --- Standardized Connection Helpers ---
+
+
 def get_connection():
-    if connection_pool:
-        return connection_pool.getconn()
-    print("Warning: No database connection available - using fallback mode")
-    return None
-    raise Exception("Postgres connection pool not available")
+    """Gets a connection from the pool."""
+    if not connection_pool:
+        raise Exception("Postgres connection pool is not available.")
+    return connection_pool.getconn()
 
 
-def release_connection(conn):
+def put_connection(conn):
+    """Returns a connection to the pool."""
     if connection_pool:
         connection_pool.putconn(conn)
+
+
+# --- FastAPI Dependency ---
+def get_db_cursor():
+    """FastAPI dependency that provides a transaction-managed database cursor."""
+    if not connection_pool:
+        raise HTTPException(status_code=503, detail="Database connection not available")
+
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        yield cursor
+        conn.commit()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print(f"Database transaction failed: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
+    finally:
+        if conn:
+            put_connection(conn)
 
 
 # ----------------------------
@@ -110,11 +79,6 @@ def init_db() -> None:
     conn = None
     try:
         conn = get_connection()
-        # --- Start of fix ---
-        if not conn:
-            print("[Postgres] Cannot initialize schema, no connection available.")
-            return
-        # --- End of fix ---
         with conn.cursor() as cursor:
             schema_queries = [
                 """
@@ -166,75 +130,63 @@ def init_db() -> None:
                 """,
             ]
             for query in schema_queries:
-                try:
-                    cursor.execute(query)
-                except Exception as e:
-                    print(f"[Postgres] Error executing query: {e}")
-                    continue
-
-            conn.commit()
-            print("[Postgres] Schema initialized successfully")
-
+                cursor.execute(query)
+        conn.commit()
+        print("[Postgres] Schema checked/initialized successfully.")
     except Exception as e:
         print(f"[Postgres] Error in init_db: {e}")
     finally:
         if conn:
-            try:
-                release_connection(conn)
-            except:
-                pass
+            put_connection(conn)
 
 
-def get_user_by_id(user_id: int, cursor):
+async def init_db_async():
+    """Async wrapper to initialize pool and schema on startup."""
+    from starlette.concurrency import run_in_threadpool
+
+    await run_in_threadpool(init_db_pool)
+    await run_in_threadpool(init_db)
+
+
+# --- Helper Functions (Copied from your original file) ---
+
+
+def get_user_by_id(user_id: int, cursor: RealDictCursor):
     """Fetch a single user by their ID."""
     cursor.execute(
         "SELECT id, username, full_name, email FROM users WHERE id = %s", (user_id,)
     )
-    user = cursor.fetchone()
-    return user
-
-
-# ----------------------------
-# User Management
-# ----------------------------
-def get_user_by_username(
-    username: str, cursor: RealDictCursor
-) -> Optional[Dict[str, Any]]:
-    cursor.execute(
-        "SELECT id, username, hashed_password FROM users WHERE username = %s;",
-        (username,),
-    )
     return cursor.fetchone()
 
 
-# ----------------------------
-# Cleaning Sessions
-# ----------------------------
+def get_user_by_username(
+    username: str, cursor: RealDictCursor
+) -> Optional[Dict[str, Any]]:
+    """Fetch a single user by their username."""
+    cursor.execute("SELECT * FROM users WHERE username = %s;", (username,))
+    return cursor.fetchone()
+
+
 def create_session(user_id: int, file_id: str, session_data: Dict[str, Any]) -> None:
     conn = get_connection()
-    if not conn:
-        return
     try:
         with conn.cursor() as cursor:
             cursor.execute(
                 """
                 INSERT INTO cleaning_sessions (user_id, file_id, session_data, last_updated)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (user_id, file_id)
-                DO UPDATE SET session_data = EXCLUDED.session_data,
-                              last_updated = EXCLUDED.last_updated;
+                VALUES (%s, %s, %s, %s) ON CONFLICT (user_id, file_id)
+                DO UPDATE SET session_data = EXCLUDED.session_data, last_updated = EXCLUDED.last_updated;
                 """,
                 (user_id, file_id, json.dumps(session_data), datetime.now()),
             )
         conn.commit()
     finally:
-        release_connection(conn)
+        if conn:
+            put_connection(conn)
 
 
 def get_session(user_id: int, file_id: str) -> Optional[Dict[str, Any]]:
     conn = get_connection()
-    if not conn:
-        return None
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -242,15 +194,14 @@ def get_session(user_id: int, file_id: str) -> Optional[Dict[str, Any]]:
                 (user_id, file_id),
             )
             result = cursor.fetchone()
-            return result[0] if result else None
+            return result["session_data"] if result else None
     finally:
-        release_connection(conn)
+        if conn:
+            put_connection(conn)
 
 
 def delete_session(user_id: int, file_id: str) -> None:
     conn = get_connection()
-    if not conn:
-        return
     try:
         with conn.cursor() as cursor:
             cursor.execute(
@@ -259,13 +210,11 @@ def delete_session(user_id: int, file_id: str) -> None:
             )
         conn.commit()
     finally:
-        release_connection(conn)
+        if conn:
+            put_connection(conn)
 
 
-# ----------------------------
-# Project Helpers
-# ----------------------------
-def create_project_entry(project_data: Dict[str, Any], cursor):
+def create_project_entry(project_data: Dict[str, Any], cursor: RealDictCursor):
     query = """
         INSERT INTO projects
             (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
@@ -275,15 +224,14 @@ def create_project_entry(project_data: Dict[str, Any], cursor):
     cursor.execute(query, project_data)
 
 
-def update_project_status(user_id: int, file_id: str, new_status: str, cursor):
+def update_project_status(
+    user_id: int, file_id: str, new_status: str, cursor: RealDictCursor
+):
     query = "UPDATE projects SET status = %s WHERE user_id = %s AND file_id = %s;"
     cursor.execute(query, (new_status, user_id, file_id))
 
 
-# ----------------------------
-# LLM Settings
-# ----------------------------
-def save_llm_settings(user_id: int, settings: dict, cursor):
+def save_llm_settings(user_id: int, settings: dict, cursor: RealDictCursor):
     provider = settings.get("provider")
     encrypted_api_key = encrypt(settings.get("api_key"))
     model_id = settings.get("model_id")
@@ -302,8 +250,6 @@ def save_llm_settings(user_id: int, settings: dict, cursor):
 
 def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
     conn = get_connection()
-    if not conn:
-        return []
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
@@ -312,7 +258,8 @@ def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
             )
             return cursor.fetchall()
     finally:
-        release_connection(conn)
+        if conn:
+            put_connection(conn)
 
 
 def get_active_llm_settings_for_user(
@@ -326,7 +273,6 @@ def get_active_llm_settings_for_user(
         WHERE s.user_id = %s ORDER BY s.updated_at DESC LIMIT 1;
         """
     cursor.execute(query, (user_id,))
-
     settings = cursor.fetchone()
     if settings:
         settings = dict(settings)
@@ -336,10 +282,7 @@ def get_active_llm_settings_for_user(
     return None
 
 
-# ----------------------------
-# Project Queries
-# ----------------------------
-def get_projects_for_user(user_id: int, cursor) -> List[Dict[str, Any]]:
+def get_projects_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
     query = """
         SELECT id, file_id, project_name, status, row_count, upload_time 
         FROM projects WHERE user_id = %s ORDER BY upload_time DESC;
@@ -348,7 +291,7 @@ def get_projects_for_user(user_id: int, cursor) -> List[Dict[str, Any]]:
     return cursor.fetchall()
 
 
-def get_dashboard_insights(user_id: int, cursor) -> Dict[str, Any]:
+def get_dashboard_insights(user_id: int, cursor: RealDictCursor) -> Dict[str, Any]:
     query_missing = """
         SELECT COUNT(*) FROM projects
         WHERE user_id = %s AND missing_values_count > 0
