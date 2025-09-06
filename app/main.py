@@ -81,7 +81,7 @@ async def startup_event():
     """Initialize application on startup"""
     create_directories()
 
-    # Initialize Redis first (it's usually faster)
+    # Initialize Redis first (it's usually faster), s
     init_redis()
 
     # Initialize DB with timeout
