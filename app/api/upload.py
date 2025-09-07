@@ -104,7 +104,12 @@ async def upload_file(
         # --- UPLOAD TO GCS INSTEAD OF LOCAL DISK ---
         blob = bucket.blob(stored_filename)
         blob.upload_from_string(content)
-        file_url = blob.public_url
+        file_url = blob.generate_signed_url(
+            version="v4",
+            expiration=datetime.timedelta(hours=1),  # URL valid for 1 hour
+            method="GET",
+        )
+        # file_url = blob.public_url
 
         # --- Create a project entry in the database ---
         project_data = {
