@@ -75,11 +75,21 @@ def delete_session(user_id: int, file_id: str) -> None:
 def create_project_entry(project_data: Dict[str, Any], cursor: RealDictCursor):
     query = """
         INSERT INTO projects
-            (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
+            (user_id, file_id, file_url, project_name, row_count, file_size, missing_values_count, outlier_count, status)
         VALUES
-            (%(user_id)s, %(file_id)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
+            (%(user_id)s, %(file_id)s, %(file_url)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
         """
     cursor.execute(query, project_data)
+
+
+# def create_project_entry(project_data: Dict[str, Any], cursor: RealDictCursor):
+#     query = """
+#         INSERT INTO projects
+#             (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
+#         VALUES
+#             (%(user_id)s, %(file_id)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
+#         """
+#     cursor.execute(query, project_data)
 
 
 def update_project_status(
@@ -140,11 +150,22 @@ def get_active_llm_settings_for_user(
 
 def get_projects_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
     query = """
-        SELECT id, file_id, project_name, status, row_count, upload_time 
-        FROM projects WHERE user_id = %s ORDER BY upload_time DESC;
+        SELECT id, file_id, file_url, project_name, status, row_count, upload_time 
+        FROM projects 
+        WHERE user_id = %s 
+        ORDER BY upload_time DESC;
     """
     cursor.execute(query, (user_id,))
     return cursor.fetchall()
+
+
+# def get_projects_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
+#     query = """
+#         SELECT id, file_id, project_name, status, row_count, upload_time
+#         FROM projects WHERE user_id = %s ORDER BY upload_time DESC;
+#     """
+#     cursor.execute(query, (user_id,))
+#     return cursor.fetchall()
 
 
 def get_dashboard_insights(user_id: int, cursor: RealDictCursor) -> Dict[str, Any]:

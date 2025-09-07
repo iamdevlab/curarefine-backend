@@ -1,4 +1,6 @@
 # app/routers/cleaning.py
+import io
+import os
 import json
 import traceback
 from pathlib import Path
@@ -23,8 +25,11 @@ from app.services.redis_client import (
     set_session,
 )
 from app.services.security import get_current_user
+from google.cloud import storage
+
 
 router = APIRouter(prefix="/clean", tags=["cleaning"])
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "")
 UPLOAD_DIR = Path("uploads")
 
 
@@ -86,13 +91,40 @@ class SaveProjectRequest(BaseModel):
     state: ProjectState
 
 
-# --- Helpers ---
 def get_dataframe(file_id: str) -> pd.DataFrame:
-    file_path = UPLOAD_DIR / file_id
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-
+    """
+    Loads a DataFrame either from local uploads/ (dev) or from GCS (prod).
+    """
     try:
+        # --- 1. Try GCS first if bucket is set ---
+        if GCS_BUCKET_NAME:
+            client = storage.Client()
+            bucket = client.bucket(GCS_BUCKET_NAME)
+            blob = bucket.blob(file_id)
+
+            if not blob.exists():
+                raise HTTPException(status_code=404, detail="File not found in GCS")
+
+            # download into memory
+            content = blob.download_as_bytes()
+            suffix = Path(file_id).suffix.lower()
+
+            if suffix == ".csv":
+                return pd.read_csv(io.BytesIO(content))
+            elif suffix in [".xlsx", ".xls"]:
+                return pd.read_excel(io.BytesIO(content))
+            elif suffix == ".json":
+                return pd.read_json(io.BytesIO(content))
+            elif suffix == ".parquet":
+                return pd.read_parquet(io.BytesIO(content))
+            else:
+                raise HTTPException(status_code=400, detail="Unsupported file type")
+
+        # --- 2. Fallback to local (dev mode) ---
+        file_path = UPLOAD_DIR / file_id
+        if not file_path.exists():
+            raise HTTPException(status_code=404, detail="File not found")
+
         suffix = file_path.suffix.lower()
         if suffix == ".csv":
             return pd.read_csv(file_path)
@@ -104,8 +136,31 @@ def get_dataframe(file_id: str) -> pd.DataFrame:
             return pd.read_parquet(file_path)
         else:
             raise HTTPException(status_code=400, detail="Unsupported file type")
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
+
+
+# --- Helpers ---
+# def get_dataframe(file_id: str) -> pd.DataFrame:
+#     file_path = UPLOAD_DIR / file_id
+#     if not file_path.exists():
+#         raise HTTPException(status_code=404, detail="File not found")
+
+#     try:
+#         suffix = file_path.suffix.lower()
+#         if suffix == ".csv":
+#             return pd.read_csv(file_path)
+#         elif suffix in [".xlsx", ".xls"]:
+#             return pd.read_excel(file_path)
+#         elif suffix == ".json":
+#             return pd.read_json(file_path)
+#         elif suffix == ".parquet":
+#             return pd.read_parquet(file_path)
+#         else:
+#             raise HTTPException(status_code=400, detail="Unsupported file type")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
 
 
 def get_or_create_cleaner(user_id: int, file_id: str) -> DataCleaner:
