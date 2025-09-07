@@ -104,11 +104,11 @@ async def upload_file(
         # --- UPLOAD TO GCS INSTEAD OF LOCAL DISK ---
         blob = bucket.blob(stored_filename)
         blob.upload_from_string(content)
-        file_url = blob.generate_signed_url(
-            version="v4",
-            expiration=timedelta(hours=1),  # URL valid for 1 hour
-            method="GET",
-        )
+        # file_url = blob.generate_signed_url(
+        #     version="v4",
+        #     expiration=timedelta(hours=1),  # URL valid for 1 hour
+        #     method="GET",
+        # )
         # file_url = blob.public_url
 
         # --- Create a project entry in the database ---
@@ -136,7 +136,6 @@ async def upload_file(
             "columns": df.columns.tolist(),
             "data_types": {col: str(df[col].dtype) for col in df.columns},
             "file_path": stored_filename,
-            "file_url": file_url,
             "preview_size": preview_size,
         }
 
@@ -161,6 +160,73 @@ async def upload_file(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
+
+
+from fastapi.responses import StreamingResponse
+from google.api_core.exceptions import NotFound, Forbidden
+import io
+
+
+@router.get("/download/{file_id}")
+async def download_file(file_id: str, current_user: dict = Depends(get_current_user)):
+    """Download a file from GCS as a streaming response"""
+    try:
+        # Verify user has access to this file (you might want to implement this)
+        # if not user_has_access_to_file(current_user["id"], file_id):
+        #     raise HTTPException(status_code=403, detail="Access denied")
+
+        blob = bucket.blob(file_id)
+
+        if not blob.exists():
+            raise HTTPException(status_code=404, detail="File not found")
+
+        # Get file size for progress reporting if needed
+        blob.reload()
+        file_size = blob.size
+
+        # Create a generator to stream the file in chunks
+        def file_generator():
+            chunk_size = 1024 * 1024  # 1MB chunks
+            with blob.open("rb") as file:
+                while True:
+                    data = file.read(chunk_size)
+                    if not data:
+                        break
+                    yield data
+
+        # Determine content type based on file extension
+        ext = Path(file_id).suffix.lower()
+        content_type = {
+            ".csv": "text/csv",
+            ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".xls": "application/vnd.ms-excel",
+            ".json": "application/json",
+            ".txt": "text/plain",
+            ".pdf": "application/pdf",
+            ".png": "image/png",
+            ".jpg": "image/jpeg",
+            ".jpeg": "image/jpeg",
+            ".gif": "image/gif",
+        }.get(ext, "application/octet-stream")
+
+        # Set appropriate headers
+        headers = {
+            "Content-Disposition": f"attachment; filename={file_id}",
+            "Content-Length": str(file_size),
+        }
+
+        return StreamingResponse(
+            file_generator(), media_type=content_type, headers=headers
+        )
+
+    except NotFound:
+        raise HTTPException(status_code=404, detail="File not found")
+    except Forbidden:
+        raise HTTPException(status_code=403, detail="Access denied")
+    except Exception as e:
+        # Log the full error for debugging
+        logger.error(f"Error downloading file {file_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error downloading file: {str(e)}")
 
 
 @router.get("/preview/{file_id}")
@@ -204,6 +270,49 @@ async def preview_file(file_id: str, page: int = 1, limit: int = 50):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error previewing file: {str(e)}")
+
+
+# @router.get("/preview/{file_id}")
+# async def preview_file(file_id: str, page: int = 1, limit: int = 50):
+#     try:
+#         # --- DOWNLOAD FILE FROM GCS ---
+#         try:
+#             blob = bucket.blob(file_id)
+#             content = blob.download_as_bytes()
+#         except NotFound:
+#             raise HTTPException(status_code=404, detail="File not found")
+
+#         df = read_file_content(content, file_id)
+#         df = df.replace({np.nan: None})
+
+#         total_rows = len(df)
+#         start = (page - 1) * limit
+#         end = start + limit
+#         preview_data = df.iloc[start:end].to_dict(orient="records")
+
+#         response = {
+#             "file_id": file_id,
+#             "filename": file_id,
+#             "columns": list(df.columns),
+#             "data": preview_data,
+#             "total_rows": total_rows,
+#             "preview_size": len(preview_data),
+#             "data_types": {col: str(dtype) for col, dtype in df.dtypes.items()},
+#             "quality_summary": {
+#                 "missing_values": df.isnull().sum().to_dict(),
+#                 "total_missing": int(df.isnull().sum().sum()),
+#                 "duplicate_rows": int(df.duplicated().sum()),
+#                 "memory_usage": int(df.memory_usage(deep=True).sum()),
+#             },
+#             "page": page,
+#             "limit": limit,
+#             "total_pages": (total_rows + limit - 1) // limit,
+#         }
+
+#         return JSONResponse(content=response)
+
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error previewing file: {str(e)}")
 
 
 # import io
