@@ -78,7 +78,7 @@ def read_file_content(content: bytes, filename: str) -> pd.DataFrame:
 async def upload_file(
     file: UploadFile = File(...), current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     validate_file(file)
 
     content = await file.read()
