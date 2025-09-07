@@ -75,9 +75,9 @@ def delete_session(user_id: int, file_id: str) -> None:
 def create_project_entry(project_data: Dict[str, Any], cursor: RealDictCursor):
     query = """
         INSERT INTO projects
-            (user_id, file_id, file_url, project_name, row_count, file_size, missing_values_count, outlier_count, status)
+            (user_id, file_id, project_name, row_count, file_size, missing_values_count, outlier_count, status)
         VALUES
-            (%(user_id)s, %(file_id)s, %(file_url)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
+            (%(user_id)s, %(file_id)s, %(project_name)s, %(row_count)s, %(file_size)s, %(missing_values_count)s, %(outlier_count)s, 'Pending');
         """
     cursor.execute(query, project_data)
 
