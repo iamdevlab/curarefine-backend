@@ -77,7 +77,7 @@ async def export_data(
     Export cleaned data based on the current frontend state and mark the project as completed.
     It prioritizes data sent in the request body, falling back to server-side session data if not provided.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         # Get the cleaner session to access the cleaning log, which might be needed for reports.
         cleaner = get_or_create_cleaner(user_id, request.file_id)
@@ -157,7 +157,7 @@ async def export_multiple_formats(
     request: MultiFormatExportRequest, current_user: dict = Depends(get_current_user)
 ):
     """Export data in multiple formats as a ZIP file."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         df = cleaner.df
@@ -211,7 +211,7 @@ async def get_cleaning_report(
     current_user: dict = Depends(get_current_user),
 ):
     """Get the cleaning report as a JSON response."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, file_id)
         if not cleaner.cleaning_log:
@@ -244,7 +244,7 @@ async def get_export_status(
     current_user: dict = Depends(get_current_user),
 ):
     """Get export status and available options for a session."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, file_id)
         df = cleaner.df

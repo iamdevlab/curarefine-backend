@@ -28,7 +28,7 @@ class PasswordUpdate(BaseModel):
 async def change_user_password(
     password_data: PasswordUpdate, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
 
     # 1. Fetch the user's current hashed password from the database
     with get_connection() as conn:
@@ -62,7 +62,7 @@ async def change_user_password(
 
 @router.get("/profile", response_model=UserProfile)
 async def get_user_profile(current_user: dict = Depends(get_current_user)):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     query = "SELECT full_name, email FROM users WHERE id = %s"
     with get_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -77,7 +77,7 @@ async def get_user_profile(current_user: dict = Depends(get_current_user)):
 async def update_user_profile(
     profile_data: UserProfileUpdate, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     query = "UPDATE users SET full_name = %s, email = %s WHERE id = %s"
     with get_connection() as conn:
         with conn.cursor() as cursor:
