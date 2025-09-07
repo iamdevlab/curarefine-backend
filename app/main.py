@@ -46,6 +46,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 origins = [
     "https://curarefine.netlify.app",
     "http://localhost:8000",  # Keep for local testing
+    "http://localhost:3000",
 ]  # Allow all origins for Replit environment
 
 # Add CORS middleware
