@@ -55,13 +55,13 @@ async def get_current_user(
         user_id_str: str = payload.get("sub")
         if user_id_str is None:
             raise credentials_exception
-
+        user = get_user_by_id(int(user_id_str), cursor)
         # Using corrected type conversion
         user = get_user_by_id(int(user_id_str), cursor)
 
         if user is None:
             raise credentials_exception
         return user
-
+        user["user_id"] = user["id"]
     except (JWTError, ValueError):
         raise credentials_exception
