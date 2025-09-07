@@ -165,7 +165,7 @@ def get_dataframe(file_id: str) -> pd.DataFrame:
 
 def get_or_create_cleaner(user_id: int, file_id: str) -> DataCleaner:
     try:
-        # user_id = current_user["user_id"]
+        # user_id = current_user["id"]
         session_data = redis_get_session(user_id, file_id)
 
         if session_data:
@@ -193,7 +193,7 @@ def prepare_df_for_serialization(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_cleaning_response(
     cleaner: DataCleaner,
-    # user_id: int,
+    user_id: int,
     file_id: str,
     message: str,
 ):
@@ -224,7 +224,7 @@ async def save_project_state(
     """
     Receives the full frontend state, saves it, and updates the project status.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         state_dict = request.state.model_dump()
 
@@ -262,7 +262,7 @@ async def load_project_state(
     Checks for a saved session in the database. If it exists, returns the saved state.
     Otherwise, falls back to loading the original uploaded file.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         # Check the database for a saved session
         saved_state_data = pg_get_session(user_id, file_id)
@@ -295,7 +295,7 @@ async def handle_missing_values(
     request: MissingValuesRequest, current_user: dict = Depends(get_current_user)
 ):
     try:
-        user_id = current_user["user_id"]
+        user_id = current_user["id"]
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         cleaner.handle_missing_values(
             strategy=request.strategy,
@@ -318,7 +318,7 @@ async def handle_missing_values(
 async def remove_duplicates(
     request: DuplicatesRequest, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         cleaner.remove_duplicates(subset=request.subset, keep=request.keep)
@@ -338,7 +338,7 @@ async def remove_duplicates(
 async def clean_text_columns(
     request: TextCleaningRequest, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         # --- ADD LOGGING HERE ---
@@ -375,7 +375,7 @@ async def clean_text_columns(
 async def handle_outliers(
     request: OutliersRequest, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         cleaner.handle_outliers(
@@ -399,7 +399,7 @@ async def handle_outliers(
 async def convert_data_types(
     request: ConvertTypesRequest, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         cleaner.convert_data_types(conversions=request.conversions)
@@ -419,7 +419,7 @@ async def convert_data_types(
 async def standardize_columns(
     request: StandardizeColumnsRequest, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         cleaner.standardize_column_names()
@@ -442,7 +442,7 @@ async def preview_data(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=200),
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, file_id)
         serializable_df = prepare_df_for_serialization(cleaner.df)
@@ -466,7 +466,7 @@ async def preview_data(
 async def get_recommendations(
     file_id: str, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, file_id)
         return {
@@ -489,7 +489,7 @@ async def get_recommendations(
 async def end_cleaning_session(
     file_id: str, current_user: dict = Depends(get_current_user)
 ):
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         redis_delete_session(user_id, file_id)
         return {

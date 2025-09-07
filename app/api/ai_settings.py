@@ -86,7 +86,7 @@ async def get_user_providers_for_dropdown(
     Retrieves all of a user's saved providers and identifies which one is
     currently active. This is used to populate the frontend dropdown.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         # First, find the single active provider to identify it in the response
         active_settings = get_active_llm_settings_for_user(user_id, cursor)
@@ -227,7 +227,7 @@ async def set_active_provider(
     """
     Sets a provider as active by updating its 'updated_at' timestamp.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         # This query finds the user's specific setting for a provider
         # and updates its timestamp to the current time.
@@ -260,7 +260,7 @@ async def save_user_llm_settings(
     current_user: dict = Depends(get_current_user),
 ):
     """Saves or updates a user's LLM settings by calling the database client."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         settings = req.settings.model_dump()
         save_llm_settings(user_id=user_id, settings=settings, cursor=cursor)
@@ -279,7 +279,7 @@ async def get_user_llm_settings(
     current_user: dict = Depends(get_current_user),
 ):
     """Retrieves a user's LLM settings from the database."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         query = """
             SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
@@ -309,7 +309,7 @@ async def get_all_user_llm_settings(
     current_user: dict = Depends(get_current_user),
 ):
     """Retrieves all saved LLM settings for a given user from the database."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         query = """
             SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint

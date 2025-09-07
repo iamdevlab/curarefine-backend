@@ -404,7 +404,7 @@ async def ai_analysis(
     request: AIAnalysisRequest, current_user: dict = Depends(get_current_user)
 ):
     """Perform AI-powered data analysis, choosing the engine dynamically based on the request."""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         df = cleaner.df
@@ -480,7 +480,7 @@ async def deep_data_analysis(
     Performs a comprehensive analysis, dynamically choosing between the
     internal deep scan (rules + outliers) and an external AI provider.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         # 1. Get the current DataFrame
         cleaner = get_or_create_cleaner(user_id, request.file_id)
@@ -604,7 +604,7 @@ async def deep_data_analysis(
 #     request: AIAnalysisRequest, current_user: dict = Depends(get_current_user)
 # ):
 #     """Perform AI-powered data analysis, choosing the engine dynamically."""
-#     user_id = current_user["user_id"]
+#     user_id = current_user["id"]
 #     try:
 #         cleaner = get_or_create_cleaner(user_id, request.file_id)
 #         df = cleaner.df
@@ -734,7 +734,7 @@ async def deep_data_analysis(
 #     Performs a comprehensive analysis including internal recommendations
 #     and advanced outlier detection.
 #     """
-#     user_id = current_user["user_id"]
+#     user_id = current_user["id"]
 #     try:
 #         # 1. Get the current, cleaned DataFrame for the user's session
 #         cleaner = get_or_create_cleaner(user_id, request.file_id)
@@ -797,7 +797,7 @@ async def auto_clean_data(
     request: AutoCleanRequest, current_user: dict = Depends(get_current_user)
 ):
     """Automatically clean data using AI recommendations"""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
 
@@ -878,7 +878,7 @@ async def get_ai_insights(
     request: AIInsightsRequest, current_user: dict = Depends(get_current_user)
 ):
     """Get comprehensive AI-powered insights about the data"""
-    user_id = current_user["user_id"]
+    user_id = current_user["id"]
     try:
         cleaner = get_or_create_cleaner(user_id, request.file_id)
         df = cleaner.df
