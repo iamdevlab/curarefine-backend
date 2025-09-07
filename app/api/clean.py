@@ -193,7 +193,7 @@ def prepare_df_for_serialization(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_cleaning_response(
     cleaner: DataCleaner,
-    # user_id: int,
+    user_id: int,
     file_id: str,
     message: str,
 ):
