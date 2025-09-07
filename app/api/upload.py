@@ -106,7 +106,7 @@ async def upload_file(
         blob.upload_from_string(content)
         file_url = blob.generate_signed_url(
             version="v4",
-            expiration=datetime.timedelta(hours=1),  # URL valid for 1 hour
+            expiration=timedelta(hours=1),  # URL valid for 1 hour
             method="GET",
         )
         # file_url = blob.public_url
