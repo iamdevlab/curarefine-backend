@@ -44,7 +44,7 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 origins = [
-    "https://2969fdaa.curarefine-frontend.pages.dev/",
+    "https://2969fdaa.curarefine-frontend.pages.dev",
     "http://localhost:8000",
     "http://localhost:3000",
     "http://localhost:5173",
