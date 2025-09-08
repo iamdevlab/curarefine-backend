@@ -44,9 +44,10 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 origins = [
-    "https://curarefine.netlify.app",
-    "http://localhost:8000",  # Keep for local testing
+    "https://2969fdaa.curarefine-frontend.pages.dev/",
+    "http://localhost:8000",
     "http://localhost:3000",
+    "http://localhost:5173",
 ]  # Allow all origins for Replit environment
 
 # Add CORS middleware
