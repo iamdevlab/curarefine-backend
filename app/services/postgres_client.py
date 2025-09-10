@@ -19,7 +19,7 @@ def init_db_pool():
             if not db_url:
                 raise ValueError("DATABASE_URL environment variable not set.")
             connection_pool = pool.SimpleConnectionPool(
-                minconn=1, maxconn=10, dsn=db_url
+                minconn=1, maxconn=20, dsn=db_url
             )
             print("[Postgres] Connection pool created successfully.")
         except Exception as e:
