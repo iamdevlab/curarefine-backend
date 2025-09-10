@@ -11,13 +11,13 @@ class OutlierDetector:
     Modular outlier detection supporting IQR, Z-score, and Isolation Forest.
     Produces both machine-friendly flags and human-readable summaries.
     """
-
+    #=======
     def __init__(
         self,
         df: pd.DataFrame,
         methods: Optional[List[str]] = None,
-        zscore_threshold: float = 3.0,
-        iqr_multiplier: float = 1.5,
+        zscore_threshold: float = 2.0,
+        iqr_multiplier: float = 1.4,
         iso_forest_contamination: float = 0.05,
     ):
         self.df = df
