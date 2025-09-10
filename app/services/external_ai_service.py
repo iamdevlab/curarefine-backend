@@ -93,7 +93,7 @@ async def generate_external_recommendations(
     provider = settings.get("provider")
     api_key = settings.get("api_key")
     model_id = settings.get("model_id")
-    endpoint_url = settings.get("final_endpoint_url")
+    endpoint_url = settings.get("self_hosted_endpoint")
 
     if not endpoint_url:
         print(f"No endpoint URL available for provider '{provider}'.")
@@ -178,7 +178,7 @@ async def generate_external_recommendations(
                 return []
 
             # 8. Clean and load the final JSON output.
-            # Some models wrap their JSON output in markdown code blocks.
+
             if response_content.strip().startswith("```json"):
                 response_content = response_content.strip()[7:-3].strip()
 
@@ -186,7 +186,7 @@ async def generate_external_recommendations(
                 "recommendations", []
             )
 
-            # --- FIX: Standardize the response before sending it to the frontend ---
+
             standardized_recommendations = []
             for rec in raw_recommendations:
                 # The external AI might use 'operation' instead of 'type'. We map it here.
@@ -198,7 +198,7 @@ async def generate_external_recommendations(
                     standardized_recommendations.append(rec)
 
             return standardized_recommendations
-            # --- END FIX ---
+
 
     except httpx.RequestError as e:
         print(f"Network error calling {provider}: {e}")

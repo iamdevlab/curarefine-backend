@@ -86,6 +86,7 @@ class OutlierDetector:
             results[col] = {
                 "flags": consensus_flags.reindex(self.df.index, fill_value=False),
                 "summary": self.summarize(col, series, consensus_flags),
+                "outlier_count": outlier_count,
             }
 
         return results

@@ -103,7 +103,7 @@ def save_llm_settings(user_id: int, settings: dict, cursor: RealDictCursor):
     provider = settings.get("provider")
     encrypted_api_key = encrypt(settings.get("api_key"))
     model_id = settings.get("model_id")
-    endpoint_url = settings.get("endpoint_url")
+    endpoint_url = settings.get("self_hosted_endpoint")
     cursor.execute(
         """
         INSERT INTO user_llm_settings (user_id, provider, api_key, model_id, endpoint_url, updated_at)
@@ -129,6 +129,64 @@ def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
         if conn:
             put_connection(conn)
 
+
+def get_llm_settings_for_provider(
+        user_id: int, provider: str, cursor: RealDictCursor
+) -> Optional[Dict[str, Any]]:
+    """
+    Fetches user-specific settings (API key, model) and combines them
+    with the centrally-managed endpoint URL for the given provider.
+    """
+    # Step 1: Get the user's specific settings (API key, model_id, etc.)
+    user_settings_query = """
+                          SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
+                          FROM user_llm_settings
+                          WHERE user_id = %s \
+                            AND provider = %s; \
+                          """
+    cursor.execute(user_settings_query, (user_id, provider))
+    settings = cursor.fetchone()
+
+    if not settings:
+        return None  # User has not configured this provider
+
+    settings = dict(settings)
+    if settings.get("api_key"):
+        settings["api_key"] = decrypt(settings["api_key"])
+
+    # Step 2: If the provider is not self-hosted, get the URL from the admin table.
+    if provider != "self-hosted":
+        admin_endpoint_query = """
+         SELECT default_endpoint_url FROM provider_endpoint WHERE identifier = %s;
+        """
+        cursor.execute(admin_endpoint_query, (provider,))
+        endpoint_data = cursor.fetchone()
+
+        # Replace the (likely null) self_hosted_endpoint with the official one
+        if endpoint_data:
+            settings["self_hosted_endpoint"] = endpoint_data['url']
+        else:
+            # Handle case where provider is not in the admin table
+            settings["self_hosted_endpoint"] = None
+
+    return settings
+# def get_llm_settings_for_provider(
+#     user_id: int, provider: str, cursor: RealDictCursor
+# ) -> Optional[Dict[str, Any]]:
+#     """Fetches the settings for a specific provider for a user."""
+#     query = """
+#         SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
+#         FROM user_llm_settings
+#         WHERE user_id = %s AND provider = %s;
+#     """
+#     cursor.execute(query, (user_id, provider))
+#     settings = cursor.fetchone()
+#     if settings:
+#         settings = dict(settings)
+#         if settings.get("api_key"):
+#             settings["api_key"] = decrypt(settings["api_key"])
+#         return settings
+#     return None
 
 def get_active_llm_settings_for_user(
     user_id: int, cursor: RealDictCursor
