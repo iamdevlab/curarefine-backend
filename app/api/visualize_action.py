@@ -42,8 +42,7 @@ async def create_visualizations(
             table_data=request.rows, domain=request.domain
         )
 
-        # 💡 FIX: Return the full chart specification objects directly.
-        # Do not extract just the 'spec' property.
+
         return {
             "message": "Successfully generated chart specifications.",
             "charts": chart_specs,
