@@ -15,7 +15,7 @@ from app.services.db_queries import (
     get_all_llm_settings_for_user,
     save_llm_settings,
 )
-from app.services.postgres_client import get_connection
+from app.services.postgres_client import get_connection, put_connection
 from app.services.security import get_current_user
 
 # Router setup
@@ -40,7 +40,7 @@ def get_db_cursor():
         raise HTTPException(status_code=500, detail="Database connection failed.")
     finally:
         if conn:
-            conn.close()
+            put_connection(conn)
 
 
 # --- Pydantic Models ---
