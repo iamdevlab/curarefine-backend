@@ -429,7 +429,6 @@ async def ai_analysis(
                 with get_connection() as conn:
                     with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                         active_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
-                        #active_settings = get_active_llm_settings_for_user(user_id, cursor)
 
 
                 if active_settings and (
@@ -501,7 +500,6 @@ async def deep_data_analysis(
             with get_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     active_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
-                    #active_settings = get_active_llm_settings_for_user(user_id, cursor)
 
 
             if active_settings and (
