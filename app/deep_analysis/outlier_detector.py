@@ -83,6 +83,7 @@ class OutlierDetector:
                 flag_matrix = pd.DataFrame(method_flags)
                 consensus_flags = flag_matrix.mean(axis=1) > 0.5
 
+            outlier_count = int(consensus_flags.sum())
             results[col] = {
                 "flags": consensus_flags.reindex(self.df.index, fill_value=False),
                 "summary": self.summarize(col, series, consensus_flags),
