@@ -134,96 +134,101 @@ def get_llm_settings_for_provider(
         user_id: int, provider: str, cursor: RealDictCursor
 ) -> Optional[Dict[str, Any]]:
     """
-    Fetches user-specific settings (API key, model) and combines them
+    Fetches user-specific LLM/provider settings and combines them
     with the centrally-managed endpoint URL for the given provider.
+
+    Fixes applied:
+    1. Validates the API key before decrypting to avoid 'token must be bytes or str'.
+    2. Corrects the key name when fetching admin endpoint URL.
+    3. Fails gracefully if API key is invalid or missing.
     """
-    # Step 1: Get the user's specific settings (API key, model_id, etc.)
+    # Step 1: Get the user's specific settings (API key, model_id, self_hosted_endpoint)
     user_settings_query = """
-                          SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
-                          FROM user_llm_settings
-                          WHERE user_id = %s \
-                            AND provider = %s; \
-                          """
+        SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
+        FROM user_llm_settings
+        WHERE user_id = %s AND provider = %s;
+    """
     cursor.execute(user_settings_query, (user_id, provider))
     settings = cursor.fetchone()
 
+    # If the user has not configured this provider, return None
     if not settings:
-        return None  # User has not configured this provider
+        return None
 
     settings = dict(settings)
-    if settings.get("api_key"):
-        settings["api_key"] = decrypt(settings["api_key"])
 
-    # Step 2: If the provider is not self-hosted, get the URL from the admin table.
+    # Step 2: Safely decrypt API key if present and valid type
+    if settings.get("api_key") and isinstance(settings["api_key"], (str, bytes)):
+        try:
+            settings["api_key"] = decrypt(settings["api_key"])
+        except Exception:
+            # Fail gracefully: if decryption fails, nullify the API key
+            settings["api_key"] = None
+    else:
+        settings["api_key"] = None
+
+    # Step 3: If the provider is not self-hosted, get the admin-managed endpoint
     if provider != "self-hosted":
         admin_endpoint_query = """
-         SELECT default_endpoint_url FROM provider_endpoint WHERE identifier = %s;
+            SELECT default_endpoint_url FROM provider_endpoint WHERE identifier = %s;
         """
         cursor.execute(admin_endpoint_query, (provider,))
         endpoint_data = cursor.fetchone()
 
-        # Replace the (likely null) self_hosted_endpoint with the official one
+        # Use correct key from DB or fallback to None
         if endpoint_data:
-            settings["self_hosted_endpoint"] = endpoint_data['url']
+            settings["self_hosted_endpoint"] = endpoint_data['default_endpoint_url']
         else:
-            # Handle case where provider is not in the admin table
             settings["self_hosted_endpoint"] = None
 
+    # Optional: skip providers without a valid API key entirely
+    if settings["api_key"] is None and provider != "self-hosted":
+        return None
+
     return settings
-# def get_llm_settings_for_provider(
-#     user_id: int, provider: str, cursor: RealDictCursor
-# ) -> Optional[Dict[str, Any]]:
-#     """Fetches the settings for a specific provider for a user."""
-#     query = """
-#         SELECT provider, api_key, model_id, endpoint_url AS self_hosted_endpoint
-#         FROM user_llm_settings
-#         WHERE user_id = %s AND provider = %s;
-#     """
-#     cursor.execute(query, (user_id, provider))
-#     settings = cursor.fetchone()
-#     if settings:
-#         settings = dict(settings)
-#         if settings.get("api_key"):
-#             settings["api_key"] = decrypt(settings["api_key"])
-#         return settings
-#     return None
+
 
 def get_active_llm_settings_for_user(
     user_id: int, cursor: RealDictCursor
 ) -> Optional[Dict[str, Any]]:
+    """
+    Fetches the most recently updated LLM/provider settings for a user.
+
+    Fixes applied:
+    1. Validates the API key before decrypting to avoid 'token must be bytes or str'.
+    2. Fails gracefully if the API key is missing or invalid.
+    """
     query = """
         SELECT provider, api_key, model_id, endpoint_url
         FROM user_llm_settings
-        WHERE user_id = %s ORDER BY updated_at DESC LIMIT 1;
-        """
-    cursor.execute(query, (user_id,))
-    settings = cursor.fetchone()
-    if settings:
-        settings = dict(settings)
-        if settings.get("api_key"):
-            settings["api_key"] = decrypt(settings["api_key"])
-        return settings
-    return None
-
-
-def get_projects_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
-    query = """
-        SELECT id, file_id, file_url, project_name, status, row_count, upload_time 
-        FROM projects 
-        WHERE user_id = %s 
-        ORDER BY upload_time DESC;
+        WHERE user_id = %s
+        ORDER BY updated_at DESC
+        LIMIT 1;
     """
     cursor.execute(query, (user_id,))
-    return cursor.fetchall()
+    settings = cursor.fetchone()
+
+    if not settings:
+        return None
+
+    settings = dict(settings)
+
+    # Safely decrypt API key if present and valid
+    if settings.get("api_key") and isinstance(settings["api_key"], (str, bytes)):
+        try:
+            settings["api_key"] = decrypt(settings["api_key"])
+        except Exception:
+            # Fail gracefully: if decryption fails, nullify the API key
+            settings["api_key"] = None
+    else:
+        settings["api_key"] = None
 
 
-# def get_projects_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
-#     query = """
-#         SELECT id, file_id, project_name, status, row_count, upload_time
-#         FROM projects WHERE user_id = %s ORDER BY upload_time DESC;
-#     """
-#     cursor.execute(query, (user_id,))
-#     return cursor.fetchall()
+    if settings["api_key"] is None and settings["provider"] != "self-hosted":
+        return None
+
+    return settings
+
 
 
 def get_dashboard_insights(user_id: int, cursor: RealDictCursor) -> Dict[str, Any]:
