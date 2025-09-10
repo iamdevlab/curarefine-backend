@@ -93,7 +93,7 @@ async def get_user_providers_for_dropdown(
         active_provider_id = active_settings["provider"] if active_settings else None
 
         # Then, get the list of all providers the user has configured
-        all_providers = get_all_llm_settings_for_user(user_id)
+        all_providers = get_all_llm_settings_for_user(user_id, cursor)
 
         return {
             "status": "success",
