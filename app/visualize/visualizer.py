@@ -1,17 +1,16 @@
 # # app/services/visualizer.py
 # app/services/visualizer.py
-
+import  json
 import pandas as pd
 import numpy as np
 import logging
-from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime
-import re
+from typing import List, Dict, Any, Optional
+
 
 # Import Plotly
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+
 
 # Logging setup
 logging.basicConfig(
@@ -320,7 +319,7 @@ class VisualizationService:
                             {
                                 "type": "bar",
                                 "title": f"{num_col} by {cat_col}",
-                                "spec": fig.to_json(),
+                                "spec":  json.loads(fig.to_json()),
                                 "description": f"Bar chart showing {num_col} values across different {cat_col} categories",
                             }
                         )
@@ -352,7 +351,7 @@ class VisualizationService:
                         {
                             "type": "bar",
                             "title": f"{num_col} by {cat_col1} and {cat_col2}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Grouped bar chart showing {num_col} values across {cat_col1} and {cat_col2}",
                         }
                     )
@@ -398,7 +397,7 @@ class VisualizationService:
                         {
                             "type": "line",
                             "title": f"{num_col} over Time",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Line chart showing {num_col} trends over time",
                         }
                     )
@@ -427,7 +426,7 @@ class VisualizationService:
                         {
                             "type": "line",
                             "title": f"{num_col} over Time by {cat_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Multi-line chart showing {num_col} trends over time by {cat_col}",
                         }
                     )
@@ -461,7 +460,7 @@ class VisualizationService:
                     {
                         "type": "scatter",
                         "title": f"{y_col} vs {x_col}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Scatter plot showing relationship between {y_col} and {x_col}",
                     }
                 )
@@ -485,7 +484,7 @@ class VisualizationService:
                         {
                             "type": "scatter",
                             "title": f"{y_col} vs {x_col} by {categorical_cols[0]}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Scatter plot showing relationship between {y_col} and {x_col} colored by {categorical_cols[0]}",
                         }
                     )
@@ -514,7 +513,7 @@ class VisualizationService:
                     {
                         "type": "histogram",
                         "title": f"Distribution of {num_col}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Histogram showing distribution of {num_col} values",
                     }
                 )
@@ -545,7 +544,7 @@ class VisualizationService:
                     {
                         "type": "box",
                         "title": f"Box Plot of {num_col}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Box plot showing distribution and outliers of {num_col}",
                     }
                 )
@@ -570,7 +569,7 @@ class VisualizationService:
                         {
                             "type": "box",
                             "title": f"{num_col} by {cat_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Box plot showing distribution of {num_col} across {cat_col} categories",
                         }
                     )
@@ -607,7 +606,7 @@ class VisualizationService:
                         {
                             "type": "violin",
                             "title": f"Distribution of {num_col} by {cat_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Violin plot showing distribution of {num_col} across {cat_col} categories",
                         }
                     )
@@ -643,7 +642,7 @@ class VisualizationService:
                         {
                             "type": "pie",
                             "title": f"Distribution of {cat_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Pie chart showing distribution of {cat_col} categories",
                         }
                     )
@@ -668,7 +667,7 @@ class VisualizationService:
                         {
                             "type": "pie",
                             "title": f"Proportion of {num_col} by {cat_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Pie chart showing proportion of {num_col} across {cat_col} categories",
                         }
                     )
@@ -703,7 +702,7 @@ class VisualizationService:
                     {
                         "type": "heatmap",
                         "title": "Correlation Matrix",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": "Heatmap showing correlations between numeric variables",
                     }
                 )
@@ -728,7 +727,7 @@ class VisualizationService:
                         {
                             "type": "heatmap",
                             "title": f"Relationship between {cat_col1} and {cat_col2}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Heatmap showing relationship between {cat_col1} and {cat_col2}",
                         }
                     )
@@ -766,7 +765,7 @@ class VisualizationService:
                     {
                         "type": "correlation",
                         "title": "Correlation Matrix",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": "Correlation matrix showing relationships between numeric variables",
                     }
                 )
@@ -802,7 +801,7 @@ class VisualizationService:
                     {
                         "type": "treemap",
                         "title": f"Treemap of {value_col} by {', '.join(path)}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Treemap showing hierarchical relationship of {value_col} across {', '.join(path)}",
                     }
                 )
@@ -838,7 +837,7 @@ class VisualizationService:
                     {
                         "type": "sunburst",
                         "title": f"Sunburst Chart of {value_col} by {', '.join(path)}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Sunburst chart showing hierarchical relationship of {value_col} across {', '.join(path)}",
                     }
                 )
@@ -876,7 +875,7 @@ class VisualizationService:
                         {
                             "type": "funnel",
                             "title": f"Funnel Chart of {value_col} by {stage_col}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Funnel chart showing {value_col} values across {stage_col} stages",
                         }
                     )
@@ -937,7 +936,7 @@ class VisualizationService:
                         {
                             "type": "candlestick",
                             "title": "Candlestick Chart",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": "Candlestick chart showing price movements over time",
                         }
                     )
@@ -971,7 +970,7 @@ class VisualizationService:
                     {
                         "type": "area",
                         "title": f"{num_col} over Time (Area Chart)",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Area chart showing {num_col} values over time",
                     }
                 )
@@ -1005,7 +1004,7 @@ class VisualizationService:
                     {
                         "type": "bubble",
                         "title": f"Bubble Chart: {y_col} vs {x_col}",
-                        "spec": fig.to_json(),
+                        "spec":  json.loads(fig.to_json()),
                         "description": f"Bubble chart showing relationship between {y_col} and {x_col} with size representing {size_col}",
                     }
                 )
@@ -1028,7 +1027,7 @@ class VisualizationService:
                         {
                             "type": "bubble",
                             "title": f"Bubble Chart: {y_col} vs {x_col} by {categorical_cols[0]}",
-                            "spec": fig.to_json(),
+                            "spec":  json.loads(fig.to_json()),
                             "description": f"Bubble chart showing relationship between {y_col} and {x_col} colored by {categorical_cols[0]} with size representing {size_col}",
                         }
                     )
@@ -1088,7 +1087,7 @@ class VisualizationService:
                             {
                                 "type": "radar",
                                 "title": f"Radar Chart: {cat_col} = {category}",
-                                "spec": fig.to_json(),
+                                "spec":  json.loads(fig.to_json()),
                                 "description": f"Radar chart showing normalized values of numeric variables for {cat_col} = {category}",
                             }
                         )
