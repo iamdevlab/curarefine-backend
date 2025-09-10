@@ -27,7 +27,7 @@ async def create_visualizations(
 ):
     """
     Receives table data, generates chart specifications using the VisualizationService,
-    and returns them as a list of JSON strings.
+    and returns them as a list of structured chart objects.
     """
     logger.info(f"Received visualization request for domain: {request.domain}")
 
@@ -37,13 +37,13 @@ async def create_visualizations(
         )
 
     try:
-        # This now calls the correct service which returns JSON specs
+        # This calls the service which returns a list of chart specification objects
         chart_specs = VisualizationService.generate_visualizations(
             table_data=request.rows, domain=request.domain
         )
 
-        # --- FIX 2: Return the "charts" key for the interactive frontend ---
-        # This was incorrectly returning "chart_urls"
+        # 💡 FIX: Return the full chart specification objects directly.
+        # Do not extract just the 'spec' property.
         return {
             "message": "Successfully generated chart specifications.",
             "charts": chart_specs,

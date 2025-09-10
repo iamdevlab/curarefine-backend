@@ -14,7 +14,7 @@ from app.api.clean import get_or_create_cleaner
 from app.deep_analysis.outlier_detector import OutlierDetector
 from app.services.data_cleaner import DataCleaner
 from app.services.external_ai_service import generate_external_recommendations
-from app.services.db_queries import get_active_llm_settings_for_user
+from app.services.db_queries import get_active_llm_settings_for_user, get_llm_settings_for_provider
 from app.services.postgres_client import get_connection
 from app.services.security import get_current_user
 
@@ -428,9 +428,9 @@ async def ai_analysis(
                 active_settings = None
                 with get_connection() as conn:
                     with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                        active_settings = get_active_llm_settings_for_user(
-                            user_id, cursor
-                        )
+                        provider_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
+                        #active_settings = get_active_llm_settings_for_user(user_id, cursor)
+
 
                 if active_settings and (
                     active_settings.get("api_key")
@@ -500,7 +500,9 @@ async def deep_data_analysis(
             active_settings = None
             with get_connection() as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-                    active_settings = get_active_llm_settings_for_user(user_id, cursor)
+                    provider_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
+                    #active_settings = get_active_llm_settings_for_user(user_id, cursor)
+
 
             if active_settings and (
                 active_settings.get("api_key")
@@ -538,7 +540,7 @@ async def deep_data_analysis(
                         },
                     }
                     for col, result in outlier_results.items()
-                    if "potential outliers" in result["summary"]
+                    if result.get("outlier_count", 0) > 0
                 ]
                 recommendations = initial_recommendations + outlier_recommendations
 
@@ -571,7 +573,7 @@ async def deep_data_analysis(
                     },
                 }
                 for col, result in outlier_results.items()
-                if "potential outliers" in result["summary"]
+                if result.get("outlier_count", 0) > 0
             ]
 
             # Combine both lists into a single response
@@ -597,199 +599,6 @@ async def deep_data_analysis(
 
 
 # Main endpoint for AI-powered data analysis
-
-
-# @router.post("/analyze")
-# async def ai_analysis(
-#     request: AIAnalysisRequest, current_user: dict = Depends(get_current_user)
-# ):
-#     """Perform AI-powered data analysis, choosing the engine dynamically."""
-#     user_id = current_user["id"]
-#     try:
-#         cleaner = get_or_create_cleaner(user_id, request.file_id)
-#         df = cleaner.df
-
-#         result = {
-#             "file_id": request.file_id,
-#             "analysis_type": request.analysis_type,
-#             "timestamp": datetime.now().isoformat(),
-#         }
-
-#         # --- NEW: Check for user's external AI settings ---
-#         active_settings = None
-#         with get_connection() as conn:
-#             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-#                 active_settings = get_active_llm_settings_for_user(user_id, cursor)
-#         print(f"--- 🔍 Retrieved AI Settings for user {user_id}: {active_settings} ---")
-
-#         if request.analysis_type == "suggest_cleaning":
-
-#             recommendations = []
-#             analysis_engine = "internal"  # Default to the built-in engine
-
-#             # --- MODIFIED: Dynamic switch for generating recommendations ---
-#             if active_settings and (
-#                 active_settings.get("api_key")
-#                 or active_settings.get("self_hosted_endpoint")
-#             ):
-#                 # 🤖 If settings are found, use the new external AI service.
-#                 print("--- Using External AI Service ---")
-#                 analysis_engine = active_settings.get("provider", "external")
-#                 recommendations = await generate_external_recommendations(
-#                     df, active_settings
-#                 )
-#             else:
-#                 # ⚙️ If no settings are found, run the original, working code as a fallback.
-#                 print("--- Using Internal DataIntelligenceService (Fallback) ---")
-#                 recommendations = (
-#                     DataIntelligenceService.generate_cleaning_recommendations(df)
-#                 )
-
-#             # --- NEW: Add the analysis engine to the result ---
-#             result["analysis_engine"] = analysis_engine
-#             result["recommendations"] = recommendations
-#             result["total_recommendations"] = len(recommendations)
-
-#         elif request.analysis_type == "detect_patterns":
-#             columns_to_analyze = request.specific_columns or df.columns.tolist()
-#             patterns = {}
-#             for col in columns_to_analyze:
-#                 if col in df.columns:
-#                     patterns[col] = DataIntelligenceService.analyze_column_patterns(
-#                         df[col]
-#                     )
-#             result["patterns"] = patterns
-
-#         elif request.analysis_type == "quality_assessment":
-#             quality_issues = DataIntelligenceService.detect_data_quality_issues(df)
-#             result["quality_assessment"] = quality_issues
-
-#         elif request.analysis_type == "column_analysis":
-#             columns_to_analyze = request.specific_columns or df.columns.tolist()
-#             column_insights = {}
-#             for col in columns_to_analyze:
-#                 if col in df.columns:
-#                     insights = {
-#                         "basic_stats": {
-#                             "count": len(df[col]),
-#                             "unique": df[col].nunique(),
-#                             "missing": df[col].isnull().sum(),
-#                             "data_type": str(df[col].dtype),
-#                         },
-#                         "patterns": DataIntelligenceService.analyze_column_patterns(
-#                             df[col]
-#                         ),
-#                     }
-#                     if df[col].dtype in ["int64", "float64"]:
-#                         insights["numeric_stats"] = {
-#                             "mean": (
-#                                 float(df[col].mean())
-#                                 if not df[col].isnull().all()
-#                                 else None
-#                             ),
-#                             "median": (
-#                                 float(df[col].median())
-#                                 if not df[col].isnull().all()
-#                                 else None
-#                             ),
-#                             "std": (
-#                                 float(df[col].std())
-#                                 if not df[col].isnull().all()
-#                                 else None
-#                             ),
-#                             "min": (
-#                                 float(df[col].min())
-#                                 if not df[col].isnull().all()
-#                                 else None
-#                             ),
-#                             "max": (
-#                                 float(df[col].max())
-#                                 if not df[col].isnull().all()
-#                                 else None
-#                             ),
-#                         }
-#                     column_insights[col] = insights
-#             result["column_insights"] = column_insights
-
-#         else:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=f"Unknown analysis type: {request.analysis_type}",
-#             )
-
-#         return JSONResponse(result)
-
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=500, detail=f"Error performing AI analysis: {str(e)}"
-#         )
-
-
-# New endpoint for deep data analysis combining multiple techniques
-# @router.post("/deep-analysis")
-# async def deep_data_analysis(
-#     request: AIAnalysisRequest, current_user: dict = Depends(get_current_user)
-# ):
-#     """
-#     Performs a comprehensive analysis including internal recommendations
-#     and advanced outlier detection.
-#     """
-#     user_id = current_user["id"]
-#     try:
-#         # 1. Get the current, cleaned DataFrame for the user's session
-#         cleaner = get_or_create_cleaner(user_id, request.file_id)
-#         df = cleaner.df
-
-#         # 2. Run the initial internal analysis to get baseline recommendations
-#         print("--- Running Internal DataIntelligenceService for Deep Scan ---")
-#         initial_recommendations = (
-#             DataIntelligenceService.generate_cleaning_recommendations(df)
-#         )
-
-#         # 3. Run the advanced outlier analysis
-#         print("--- Running OutlierDetector for Deep Scan ---")
-#         outlier_detector = OutlierDetector(df=df, methods=["iqr", "zscore"])
-#         outlier_results = outlier_detector.apply_pipeline()
-
-#         # 4. Convert the outlier results into the standard recommendation format
-#         outlier_recommendations = []
-#         for col, result in outlier_results.items():
-#             # Only add a recommendation if the summary indicates outliers were found
-#             if "potential outliers" in result["summary"]:
-#                 outlier_recommendations.append(
-#                     {
-#                         "type": "outliers",
-#                         "column": col,
-#                         "strategy": "handle_outliers",  # Suggests which cleaner function to use
-#                         "reason": result["summary"],
-#                         "priority": "medium",
-#                         "parameters": {
-#                             "columns": [col],
-#                             "method": "iqr",
-#                             "action": "remove",
-#                         },
-#                     }
-#                 )
-
-#         # 5. Combine both lists into a single response
-#         combined_recommendations = initial_recommendations + outlier_recommendations
-
-#         return JSONResponse(
-#             {
-#                 "file_id": request.file_id,
-#                 "analysis_type": "deep_analysis",
-#                 "analysis_engine": "DataCura Analyzer",
-#                 "timestamp": datetime.now().isoformat(),
-#                 "recommendations": combined_recommendations,
-#                 "total_recommendations": len(combined_recommendations),
-#             }
-#         )
-
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=500, detail=f"Error performing deep analysis: {str(e)}"
-#         )
-
 
 # New endpoint for automated cleaning based on AI recommendations
 @router.post("/auto-clean")
