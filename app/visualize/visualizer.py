@@ -147,49 +147,77 @@ class VisualizationService:
 
     @staticmethod
     def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
-        """Clean and preprocess the data for visualization."""
+        """
+        Clean and preprocess data with a non-destructive and robust approach to type inference.
+        """
         df_clean = df.copy()
 
-        # Drop internal IDs
         if "__id" in df_clean.columns:
-            df_clean.drop("__id", axis=1, inplace=True)
+            df_clean = df_clean.drop("__id", axis=1)
 
         for col in df_clean.columns:
-            # Try datetime
+            # Only process object columns, leave existing types alone
+            if df_clean[col].dtype != 'object':
+                continue
+
+            # Skip columns that are all null
+            if df_clean[col].isnull().all():
+                continue
+
+            # --- Stage 1: Attempt Numeric Conversion ---
+            # Try a direct conversion first, if it works, it's definitely numeric
             try:
-                df_clean[col] = pd.to_datetime(df_clean[col])
+                df_clean[col] = pd.to_numeric(df_clean[col])
                 continue
             except (ValueError, TypeError):
+                # If direct conversion fails, it might be mixed or have non-numeric chars
                 pass
 
-            # Try numeric
-            if df_clean[col].dtype == "object":
-                try:
-                    df_clean[col] = (
-                        df_clean[col]
-                        .astype(str)
-                        .str.replace(r"[^\d\.\-]", "", regex=True)  # keep digits, dot, minus
-                        .replace("", np.nan)
-                    )
-                    df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
-                except Exception:
-                    # If it really can't be numeric, leave as string
-                    pass
+            # Coerce errors to see how many values are numeric-like
+            numeric_coerced = pd.to_numeric(df_clean[col], errors='coerce')
 
-        # Fill numeric NaNs with mean
-        for col in df_clean.select_dtypes(include=[np.number]).columns:
-            if df_clean[col].isnull().any():
-                df_clean[col].fillna(df_clean[col].mean(), inplace=True)
+            # Calculate percentage of numeric values among non-null entries
+            num_non_null = df_clean[col].notna().sum()
+            if num_non_null > 0:
+                numeric_ratio = numeric_coerced.notna().sum() / num_non_null
+                if numeric_ratio > 0.9:  # Threshold: 90% of non-null values are numeric
+                    df_clean[col] = numeric_coerced
+                    continue  # Successfully converted to numeric
 
-        # Fill categorical NaNs with mode/Unknown
-        for col in df_clean.select_dtypes(include=["object", "category"]).columns:
-            if df_clean[col].isnull().any():
-                mode_val = df_clean[col].mode()
-                fill_val = mode_val[0] if not mode_val.empty else "Unknown"
-                df_clean[col].fillna(fill_val, inplace=True)
+            # --- Stage 2: Attempt Datetime Conversion ---
+            # Only if it wasn't converted to numeric
+            try:
+                datetime_coerced = pd.to_datetime(df_clean[col], errors='coerce')
+                num_non_null = df_clean[col].notna().sum()
+                if num_non_null > 0:
+                    datetime_ratio = datetime_coerced.notna().sum() / num_non_null
+                    if datetime_ratio > 0.9:  # Threshold: 90% of non-null values are datetimes
+                        df_clean[col] = datetime_coerced
+                        continue  # Successfully converted to datetime
+            except Exception:
+                # Some formats might raise exceptions in to_datetime
+                pass
+
+            # --- Stage 3: If neither, it remains an 'object' (categorical) ---
+            # This is the crucial part that preserves columns like "Product Name".
+
+        # --- Final Step: Impute NaNs after all type conversions ---
+        for col in df_clean.columns:
+            if df_clean[col].dtype in ['float64', 'int64']:
+                if df_clean[col].isnull().any():
+                    df_clean[col] = df_clean[col].fillna(df_clean[col].mean())
+            elif pd.api.types.is_datetime64_any_dtype(df_clean[col]):
+                if df_clean[col].isnull().any():
+                    # Fill with most frequent date, if available
+                    if not df_clean[col].mode().empty:
+                        df_clean[col] = df_clean[col].fillna(df_clean[col].mode()[0])
+            elif df_clean[col].dtype == 'object':
+                if df_clean[col].isnull().any():
+                    mode_val = df_clean[col].mode()
+                    fill_val = mode_val[0] if not mode_val.empty else "Unknown"
+                    df_clean[col] = df_clean[col].fillna(fill_val)
 
         return df_clean
-
     @staticmethod
     def _analyze_columns(df: pd.DataFrame) -> Dict[str, Any]:
         """Analyze column types and properties for chart generation."""
