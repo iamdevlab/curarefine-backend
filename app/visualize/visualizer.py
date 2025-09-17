@@ -26,6 +26,26 @@ class VisualizationService:
 
     # Domain-specific configurations
     DOMAIN_CONFIGS = {
+        "education": {
+            "primary_color": "#4C72B0",
+            "secondary_color": "#DD8452",
+            "default_charts": ["bar", "line", "scatter"],
+        },
+        "supermarket": {
+            "primary_color": "#55A868",
+            "secondary_color": "#C44E52",
+            "default_charts": ["bar", "pie", "treemap"],
+        },
+        "agriculture": {
+            "primary_color": "#8172B3",
+            "secondary_color": "#CCB974",
+            "default_charts": ["line", "scatter", "box"],
+        },
+        "logistics": {
+            "primary_color": "#64B5CD",
+            "secondary_color": "#4C8C8F",
+            "default_charts": ["line", "bar", "histogram"],
+        },
         "finance": {
             "primary_color": "#2E86AB",
             "secondary_color": "#A23B72",
@@ -128,33 +148,37 @@ class VisualizationService:
     @staticmethod
     def _clean_data(df: pd.DataFrame) -> pd.DataFrame:
         """Clean and preprocess the data for visualization."""
-        # Make a copy to avoid modifying the original
         df_clean = df.copy()
 
-        # Convert potential date columns
+        # Remove any non-data columns
+        if '__id' in df_clean.columns:
+            df_clean.drop('__id', axis=1, inplace=True)
+
         for col in df_clean.columns:
             # Try to convert to datetime
             try:
                 df_clean[col] = pd.to_datetime(df_clean[col])
+                continue  # Skip further processing if datetime conversion succeeded
             except (ValueError, TypeError):
                 pass
 
-            # Convert string numbers to numeric
+            # Convert string numbers to numeric, handling currency symbols and commas
             if df_clean[col].dtype == "object":
                 try:
-                    df_clean[col] = pd.to_numeric(df_clean[col])
+                    # Remove common non-numeric characters
+                    cleaned_series = df_clean[col].replace({r'[^\d.]': ''}, regex=True)
+                    df_clean[col] = pd.to_numeric(cleaned_series)
                 except (ValueError, TypeError):
-                    pass
+                    pass  # Keep as string if conversion fails
 
-        # Handle missing values
+        # Handle missing values - only fill if there are missing values
         numeric_cols = df_clean.select_dtypes(include=[np.number]).columns
         for col in numeric_cols:
-            df_clean[col].fillna(df_clean[col].mean(), inplace=True)
+            if df_clean[col].isnull().any():
+                df_clean[col].fillna(df_clean[col].mean(), inplace=True)
 
         # For categorical columns, fill with mode or "Unknown"
-        categorical_cols = df_clean.select_dtypes(
-            include=["object", "category"]
-        ).columns
+        categorical_cols = df_clean.select_dtypes(include=["object", "category"]).columns
         for col in categorical_cols:
             if df_clean[col].isnull().any():
                 mode_val = df_clean[col].mode()
