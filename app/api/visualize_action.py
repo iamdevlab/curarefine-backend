@@ -1,7 +1,7 @@
 # app/api/visualize_action.py
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -14,6 +14,7 @@ from app.visualize.visualizer import VisualizationService
 class VisualizationRequest(BaseModel):
     rows: List[Dict[str, Any]]
     domain: str = "generic"
+    chart_types: Optional[List[str]] = None  # <-- added
 
 
 # Router setup
@@ -37,11 +38,12 @@ async def create_visualizations(
         )
 
     try:
-        # This calls the service which returns a list of chart specification objects
+        # Pass chart_types through to the service
         chart_specs = VisualizationService.generate_visualizations(
-            table_data=request.rows, domain=request.domain
+            table_data=request.rows,
+            domain=request.domain,
+            chart_types=request.chart_types,
         )
-
 
         return {
             "message": "Successfully generated chart specifications.",
