@@ -345,7 +345,7 @@ class VisualizationService:
                         charts.append({
                             "type": "bar",
                             "title": f"{num_col} by {cat_col}",
-                            "spec": json.loads(fig.to_json()),
+                            "spec": fig.to_json(),
                             "description": f"Bar chart of {num_col} across {cat_col} categories",
                         })
                     except Exception as e:
@@ -373,7 +373,7 @@ class VisualizationService:
                     charts.append({
                         "type": "bar",
                         "title": f"{num_col} by {cat_col1} and {cat_col2}",
-                        "spec": json.loads(fig.to_json()),
+                        "spec": fig.to_json(),
                         "description": f"Grouped bar chart of {num_col} across {cat_col1} and {cat_col2}",
                     })
             except Exception as e:
@@ -479,7 +479,7 @@ class VisualizationService:
                 charts.append({
                     "type": "scatter",
                     "title": f"{y_col} vs {x_col}",
-                    "spec": json.loads(fig.to_json()),
+                    "spec": fig.to_json(),
                     "description": f"Scatter plot showing relationship between {y_col} and {x_col}",
                 })
             except Exception as e:
@@ -501,7 +501,7 @@ class VisualizationService:
                         charts.append({
                             "type": "scatter",
                             "title": f"{y_col} vs {x_col} by {cat_col}",
-                            "spec": json.loads(fig.to_json()),
+                            "spec": fig.to_json(),
                             "description": f"Scatter plot of {y_col} vs {x_col} grouped by {cat_col}",
                         })
                     except Exception as e:
