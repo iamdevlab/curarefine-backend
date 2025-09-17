@@ -150,36 +150,39 @@ class VisualizationService:
         """Clean and preprocess the data for visualization."""
         df_clean = df.copy()
 
-        # Remove any non-data columns
-        if '__id' in df_clean.columns:
-            df_clean.drop('__id', axis=1, inplace=True)
+        # Drop internal IDs
+        if "__id" in df_clean.columns:
+            df_clean.drop("__id", axis=1, inplace=True)
 
         for col in df_clean.columns:
-            # Try to convert to datetime
+            # Try datetime
             try:
                 df_clean[col] = pd.to_datetime(df_clean[col])
-                continue  # Skip further processing if datetime conversion succeeded
+                continue
             except (ValueError, TypeError):
                 pass
 
-            # Convert string numbers to numeric, handling currency symbols and commas
+            # Try numeric
             if df_clean[col].dtype == "object":
                 try:
-                    # Remove common non-numeric characters
-                    cleaned_series = df_clean[col].replace({r'[^\d.]': ''}, regex=True)
-                    df_clean[col] = pd.to_numeric(cleaned_series)
-                except (ValueError, TypeError):
-                    pass  # Keep as string if conversion fails
+                    df_clean[col] = (
+                        df_clean[col]
+                        .astype(str)
+                        .str.replace(r"[^\d\.\-]", "", regex=True)  # keep digits, dot, minus
+                        .replace("", np.nan)
+                    )
+                    df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
+                except Exception:
+                    # If it really can't be numeric, leave as string
+                    pass
 
-        # Handle missing values - only fill if there are missing values
-        numeric_cols = df_clean.select_dtypes(include=[np.number]).columns
-        for col in numeric_cols:
+        # Fill numeric NaNs with mean
+        for col in df_clean.select_dtypes(include=[np.number]).columns:
             if df_clean[col].isnull().any():
                 df_clean[col].fillna(df_clean[col].mean(), inplace=True)
 
-        # For categorical columns, fill with mode or "Unknown"
-        categorical_cols = df_clean.select_dtypes(include=["object", "category"]).columns
-        for col in categorical_cols:
+        # Fill categorical NaNs with mode/Unknown
+        for col in df_clean.select_dtypes(include=["object", "category"]).columns:
             if df_clean[col].isnull().any():
                 mode_val = df_clean[col].mode()
                 fill_val = mode_val[0] if not mode_val.empty else "Unknown"
@@ -320,17 +323,17 @@ class VisualizationService:
 
     @staticmethod
     def _generate_bar_charts(
-        df: pd.DataFrame, analysis: Dict[str, Any], domain_config: Dict[str, Any]
+            df: pd.DataFrame, analysis: Dict[str, Any], domain_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
-        """Generate bar charts."""
+        """Generate bar charts (less restrictive)."""
         charts = []
         numeric_cols = analysis["numeric_cols"]
         categorical_cols = analysis["categorical_cols"]
 
-        # Simple bar charts (one categorical, one numeric)
+        # One categorical vs one numeric
         for cat_col in categorical_cols:
             for num_col in numeric_cols:
-                if df[cat_col].nunique() <= 20:  # Avoid too many categories
+                if df[cat_col].nunique() <= 50:  # allow up to 50 categories now
                     try:
                         fig = px.bar(
                             df,
@@ -339,26 +342,22 @@ class VisualizationService:
                             title=f"{num_col} by {cat_col}",
                             color_discrete_sequence=[domain_config["primary_color"]],
                         )
-                        charts.append(
-                            {
-                                "type": "bar",
-                                "title": f"{num_col} by {cat_col}",
-                                "spec":  json.loads(fig.to_json()),
-                                "description": f"Bar chart showing {num_col} values across different {cat_col} categories",
-                            }
-                        )
+                        charts.append({
+                            "type": "bar",
+                            "title": f"{num_col} by {cat_col}",
+                            "spec": json.loads(fig.to_json()),
+                            "description": f"Bar chart of {num_col} across {cat_col} categories",
+                        })
                     except Exception as e:
-                        logging.warning(
-                            f"Failed to create bar chart for {cat_col} and {num_col}: {e}"
-                        )
+                        logging.warning(f"Failed bar chart for {cat_col} and {num_col}: {e}")
 
         # Grouped bar charts
-        if len(categorical_cols) >= 2 and len(numeric_cols) >= 1:
+        if len(categorical_cols) >= 2 and numeric_cols:
             try:
                 cat_col1, cat_col2 = categorical_cols[0], categorical_cols[1]
                 num_col = numeric_cols[0]
 
-                if df[cat_col1].nunique() <= 10 and df[cat_col2].nunique() <= 10:
+                if df[cat_col1].nunique() <= 15 and df[cat_col2].nunique() <= 15:
                     fig = px.bar(
                         df,
                         x=cat_col1,
@@ -371,16 +370,14 @@ class VisualizationService:
                             domain_config["secondary_color"],
                         ],
                     )
-                    charts.append(
-                        {
-                            "type": "bar",
-                            "title": f"{num_col} by {cat_col1} and {cat_col2}",
-                            "spec":  json.loads(fig.to_json()),
-                            "description": f"Grouped bar chart showing {num_col} values across {cat_col1} and {cat_col2}",
-                        }
-                    )
+                    charts.append({
+                        "type": "bar",
+                        "title": f"{num_col} by {cat_col1} and {cat_col2}",
+                        "spec": json.loads(fig.to_json()),
+                        "description": f"Grouped bar chart of {num_col} across {cat_col1} and {cat_col2}",
+                    })
             except Exception as e:
-                logging.warning(f"Failed to create grouped bar chart: {e}")
+                logging.warning(f"Failed grouped bar chart: {e}")
 
         return charts
 
@@ -461,17 +458,16 @@ class VisualizationService:
 
     @staticmethod
     def _generate_scatter_plots(
-        df: pd.DataFrame, analysis: Dict[str, Any], domain_config: Dict[str, Any]
+            df: pd.DataFrame, analysis: Dict[str, Any], domain_config: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
-        """Generate scatter plots."""
+        """Generate scatter plots for all numeric column pairs."""
         charts = []
         numeric_cols = analysis["numeric_cols"]
         categorical_cols = analysis["categorical_cols"]
 
-        if len(numeric_cols) >= 2:
-            x_col, y_col = numeric_cols[0], numeric_cols[1]
+        from itertools import combinations
 
-            # Basic scatter plot
+        for x_col, y_col in combinations(numeric_cols, 2):
             try:
                 fig = px.scatter(
                     df,
@@ -480,40 +476,36 @@ class VisualizationService:
                     title=f"{y_col} vs {x_col}",
                     color_discrete_sequence=[domain_config["primary_color"]],
                 )
-                charts.append(
-                    {
-                        "type": "scatter",
-                        "title": f"{y_col} vs {x_col}",
-                        "spec":  json.loads(fig.to_json()),
-                        "description": f"Scatter plot showing relationship between {y_col} and {x_col}",
-                    }
-                )
+                charts.append({
+                    "type": "scatter",
+                    "title": f"{y_col} vs {x_col}",
+                    "spec": json.loads(fig.to_json()),
+                    "description": f"Scatter plot showing relationship between {y_col} and {x_col}",
+                })
             except Exception as e:
-                logging.warning(
-                    f"Failed to create scatter plot for {x_col} and {y_col}: {e}"
-                )
+                logging.warning(f"Failed to create scatter plot for {x_col} vs {y_col}: {e}")
 
-            # Colored by category if available
-            if categorical_cols and df[categorical_cols[0]].nunique() <= 10:
-                try:
-                    fig = px.scatter(
-                        df,
-                        x=x_col,
-                        y=y_col,
-                        color=categorical_cols[0],
-                        title=f"{y_col} vs {x_col} by {categorical_cols[0]}",
-                        color_discrete_sequence=px.colors.qualitative.Set3,
-                    )
-                    charts.append(
-                        {
+            # Extra: color by category if manageable
+            if categorical_cols:
+                cat_col = categorical_cols[0]
+                if df[cat_col].nunique() <= 15:
+                    try:
+                        fig = px.scatter(
+                            df,
+                            x=x_col,
+                            y=y_col,
+                            color=cat_col,
+                            title=f"{y_col} vs {x_col} by {cat_col}",
+                            color_discrete_sequence=px.colors.qualitative.Set3,
+                        )
+                        charts.append({
                             "type": "scatter",
-                            "title": f"{y_col} vs {x_col} by {categorical_cols[0]}",
-                            "spec":  json.loads(fig.to_json()),
-                            "description": f"Scatter plot showing relationship between {y_col} and {x_col} colored by {categorical_cols[0]}",
-                        }
-                    )
-                except Exception as e:
-                    logging.warning(f"Failed to create colored scatter plot: {e}")
+                            "title": f"{y_col} vs {x_col} by {cat_col}",
+                            "spec": json.loads(fig.to_json()),
+                            "description": f"Scatter plot of {y_col} vs {x_col} grouped by {cat_col}",
+                        })
+                    except Exception as e:
+                        logging.warning(f"Failed colored scatter plot for {x_col} vs {y_col}: {e}")
 
         return charts
 
