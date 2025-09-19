@@ -116,19 +116,28 @@ def save_llm_settings(user_id: int, settings: dict, cursor: RealDictCursor):
     )
 
 
-def get_all_llm_settings_for_user(user_id: int) -> List[Dict[str, Any]]:
-    conn = get_connection()
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute(
-                "SELECT provider, model_id FROM user_llm_settings WHERE user_id = %s;",
-                (user_id,),
-            )
-            return cursor.fetchall()
-    finally:
-        if conn:
-            put_connection(conn)
+# def get_all_llm_settings_for_user(user_id: int, cursor: RealDictCursor) -> List[Dict[str, Any]]:
+#     conn = get_connection()
+#     try:
+#         with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+#             cursor.execute(
+#                 "SELECT provider, model_id FROM user_llm_settings WHERE user_id = %s;",
+#                 (user_id,),
+#             )
+#             return cursor.fetchall()
+#     finally:
+#         if conn:
+#             put_connection(conn)
 
+def get_all_llm_settings_for_user(
+    user_id: int, cursor: RealDictCursor
+) -> List[Dict[str, Any]]:
+    """Fetch all provider settings for a user (provider and model_id)."""
+    cursor.execute(
+        "SELECT provider, model_id FROM user_llm_settings WHERE user_id = %s;",
+        (user_id,),
+    )
+    return cursor.fetchall()
 
 def get_llm_settings_for_provider(
         user_id: int, provider: str, cursor: RealDictCursor
