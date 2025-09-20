@@ -5,6 +5,8 @@ import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Optional
+
+import logger
 from google.cloud import storage
 from google.api_core.exceptions import NotFound
 import numpy as np
