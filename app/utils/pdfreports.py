@@ -1,4 +1,4 @@
-# C:\Users\Vernon\Desktop\datacura\backend\app\utils\pdfreports.py
+# app/utils/pdfreports.py
 
 from io import BytesIO
 from datetime import datetime
@@ -16,47 +16,43 @@ class PDF(FPDF):
     def header(self):
         # Logo - wrapped in a try-except block to prevent errors if the file is missing
         try:
-            # Assuming the logo is stored in an 'assets' folder relative to the execution path
             self.image("app/assets/cura_icons.png", 10, 8, 15)
         except RuntimeError:
-            # If the logo is not found, we just print a warning and continue without it
             print("Warning: Logo file 'app/assets/cura_icons.png' not found.")
-            pass
 
         # Report Title
-        self.set_font("Arial", "B", 14)
+        self.set_font("helvetica", "B", 14)  # ✅ changed from Arial → helvetica
         self.cell(0, 10, "CURAREFINE DATA ANALYSIS REPORT", border=False, ln=1, align="C")
-        # Line break
         self.ln(10)
 
     def footer(self):
         """ Adds a page number to the bottom of each page. """
         self.set_y(-15)
-        self.set_font("Arial", "I", 8)
+        self.set_font("helvetica", "I", 8)  # ✅ Arial → helvetica
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
     def chapter_title(self, title):
         """ Creates a formatted chapter title. """
-        self.set_font("Arial", "B", 12)
+        self.set_font("helvetica", "B", 12)  # ✅ Arial → helvetica
         self.cell(0, 10, title, 0, 1, 'L')
         self.ln(4)
 
     def chapter_body(self, body):
         """ Creates formatted chapter body text. """
-        self.set_font("Arial", "", 10)
+        self.set_font("helvetica", "", 10)  # ✅ Arial → helvetica
         self.multi_cell(0, 5, body)
         self.ln()
 
     def add_dataframe(self, df):
         """ Renders a pandas DataFrame as a table in the PDF. """
-        self.set_font("Arial", 'B', 8)
+        self.set_font("helvetica", 'B', 8)  # ✅ Arial → helvetica
         # Header
         for col in df.columns:
             self.cell(35, 7, col, 1)
         self.ln()
         # Data
-        self.set_font("Arial", '', 8)
-        for index, row in df.iterrows():
+        self.set_font("helvetica", '', 8)  # ✅ Arial → helvetica
+        for _, row in df.iterrows():
             for item in row:
                 self.cell(35, 7, str(item), 1)
             self.ln()
@@ -69,29 +65,21 @@ def generate_comprehensive_report(
 ) -> BytesIO:
     """
     Generates a comprehensive PDF report from the current state of a dataset.
-
-    Args:
-        current_data: A list of dictionaries representing the rows of the current dataset.
-        project_name: The name of the project/file.
-
-    Returns:
-        A BytesIO object containing the generated PDF.
     """
     pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=15)
 
     # Convert incoming data to DataFrame
     df = pd.DataFrame(current_data)
-    # Exclude the '__id' column added by the frontend from analysis
     if '__id' in df.columns:
         df = df.drop(columns=['__id'])
 
     # --- Cover Page ---
     pdf.add_page()
-    pdf.set_font("Arial", "B", 20)
+    pdf.set_font("helvetica", "B", 20)  # ✅ Arial → helvetica
     pdf.cell(0, 20, "Comprehensive Data Report", ln=True, align="C")
     pdf.ln(10)
-    pdf.set_font("Arial", "", 12)
+    pdf.set_font("helvetica", "", 12)  # ✅ Arial → helvetica
     pdf.cell(0, 10, f"Project: {project_name}", ln=True, align="C")
     pdf.cell(0, 10, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align="C")
 
@@ -104,7 +92,7 @@ def generate_comprehensive_report(
     )
     pdf.chapter_body(overview_text)
 
-    # --- 2. Descriptive Statistics (for numeric columns) ---
+    # --- 2. Descriptive Statistics ---
     numeric_cols = df.select_dtypes(include=np.number)
     if not numeric_cols.empty:
         pdf.chapter_title("2. Descriptive Statistics")
@@ -131,7 +119,7 @@ def generate_comprehensive_report(
         plt.ylabel("% Missing")
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False, delete_on_close=False) as tmpfile:
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:  # ✅ fixed delete_on_close
             plt.savefig(tmpfile.name, dpi=150)
             pdf.image(tmpfile.name, w=170)
         plt.close()
@@ -142,15 +130,14 @@ def generate_comprehensive_report(
     if not numeric_cols.empty:
         pdf.add_page()
         pdf.chapter_title("4. Outlier Visualization (Box Plots)")
-        pdf.chapter_body(
-            "Box plots are used to visualize the distribution of numeric data and identify potential outliers.")
+        pdf.chapter_body("Box plots are used to visualize numeric data and identify potential outliers.")
 
         for col in numeric_cols.columns:
             plt.figure(figsize=(8, 4))
             plt.boxplot(numeric_cols[col].dropna(), vert=False)
             plt.title(f"Distribution of '{col}'")
             plt.tight_layout()
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False, delete_on_close=False) as tmpfile:
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:  # ✅ fixed delete_on_close
                 plt.savefig(tmpfile.name, dpi=120)
                 pdf.image(tmpfile.name, w=160)
                 pdf.ln(5)
