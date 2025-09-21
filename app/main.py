@@ -29,7 +29,7 @@ from app.api.visualize_action import router as visualize_action_router
 from app.services.postgres_client import init_db_async
 from app.services.redis_client import init_redis
 from app.utils.json_response import CustomJSONResponse as JSONResponse
-from app.services.pdf_handler import router as pdf_report_router
+
 # Create FastAPI app
 app = FastAPI(
     title="Data Cleaning API",
@@ -72,7 +72,7 @@ app.include_router(dashboard_router, prefix="/api")
 app.include_router(visualize_action_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
-app.include_router(pdf_report_router, prefix="/api/report",tags=["Report"])
+
 
 # --- (The rest of your original file is preserved below) ---
 
