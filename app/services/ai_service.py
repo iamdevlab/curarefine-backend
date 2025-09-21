@@ -15,7 +15,7 @@ from app.deep_analysis.outlier_detector import OutlierDetector
 from app.services.data_cleaner import DataCleaner
 from app.services.external_ai_service import generate_external_recommendations
 from app.services.db_queries import get_active_llm_settings_for_user, get_llm_settings_for_provider
-from app.services.postgres_client import get_connection
+from app.services.postgres_client import get_connection, put_connection
 from app.services.security import get_current_user
 
 router = APIRouter(prefix="/ai", tags=["ai-assistance"])
@@ -426,9 +426,14 @@ async def ai_analysis(
                     f"--- Frontend requested external provider: {request.provider} ---"
                 )
                 active_settings = None
-                with get_connection() as conn:
+                conn = None
+                try:
+                    conn = get_connection()
                     with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                         active_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
+                finally:
+                    if conn:
+                        put_connection(conn)
 
 
                 if active_settings and (
@@ -497,9 +502,14 @@ async def deep_data_analysis(
                 f"--- Deep Scan requested with external provider: {request.provider} ---"
             )
             active_settings = None
-            with get_connection() as conn:
+            conn = None
+            try:
+                conn = get_connection()
                 with conn.cursor(cursor_factory=RealDictCursor) as cursor:
                     active_settings = get_llm_settings_for_provider(user_id, request.provider, cursor)
+            finally:
+                if conn:
+                    put_connection(conn)
 
 
             if active_settings and (
